@@ -1,3 +1,56 @@
 <resources>
-    <string name="app_name">English Learning Android App</string>
+    <string name="app_name">English Learning</string>
+    
+    <!-- Main Activity -->
+    <string name="app_title">English Learning</string>
+    <string name="app_subtitle">Learn English with Traditional Chinese</string>
+    <string name="dictionary_button">English-Chinese-Traditional</string>
+    <string name="revision_button">Revision</string>
+    
+    <!-- Dictionary Activity -->
+    <string name="search_hint">Enter English word</string>
+    <string name="search_button">Search</string>
+    <string name="save_button">Save Selected Word</string>
+    <string name="retry_button">Retry</string>
+    <string name="search_instructions">Search for an English word to see its Traditional Chinese translations</string>
+    
+    <!-- Revision Activity -->
+    <string name="stage_selection_label">Select Revision Stage:</string>
+    <string name="translation_label">Chinese Translation:</string>
+    <string name="example_label">Example:</string>
+    <string name="answer_hint">Enter English word</string>
+    <string name="submit_button">Submit Answer</string>
+    <string name="continue_next_word">Continue to Next Word</string>
+    <string name="back_to_main">← Back to Main</string>
+    <string name="add_words_button">Add New Words</string>
+    <string name="empty_stage_message">No words in this stage yet</string>
+    
+    <!-- Feedback Messages -->
+    <string name="correct_answer">Correct!</string>
+    <string name="incorrect_answer">Incorrect. The correct answer is: %s</string>
+    <string name="word_saved_success">Word saved successfully</string>
+    <string name="network_error">No internet connection. Please check your connection and try again.</string>
+    <string name="word_not_found">Word not found. Please try a different word.</string>
+    <string name="validation_empty_search">Please enter a word to search</string>
+    <string name="progress_format">Word %d of %d</string>
+    
+    <!-- Revision Stages -->
+    <string-array name="revision_stages">
+        <item>Not revised</item>
+        <item>1st</item>
+        <item>2nd</item>
+        <item>3rd</item>
+        <item>4th</item>
+        <item>5th or above</item>
+    </string-array>
+    
+    <!-- Stage Display Names -->
+    <string-array name="stage_display_names">
+        <item>Not revised</item>
+        <item>1st review</item>
+        <item>2nd review</item>
+        <item>3rd review</item>
+        <item>4th review</item>
+        <item>5th or above</item>
+    </string-array>
 </resources>
