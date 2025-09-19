@@ -28,7 +28,8 @@ object RetrofitInstance {
      */
     private fun createOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            // Disable logging for privacy (can be enabled manually for debugging)
+            level = HttpLoggingInterceptor.Level.NONE
         }
         
         return OkHttpClient.Builder()
@@ -128,11 +129,12 @@ class ErrorInterceptor : okhttp3.Interceptor {
         val request = chain.request()
         val response = chain.proceed(request)
         
-        // Log response for debugging
-        if (!response.isSuccessful) {
-            val responseBody = response.peekBody(2048).string()
-            println("API Error - Code: ${response.code}, Message: ${response.message}, Body: $responseBody")
-        }
+        // Disable error logging for privacy in production
+        // Uncomment the following lines for debugging if needed:
+        // if (!response.isSuccessful) {
+        //     val responseBody = response.peekBody(2048).string()
+        //     println("API Error - Code: ${response.code}, Message: ${response.message}, Body: $responseBody")
+        // }
         
         return response
     }
