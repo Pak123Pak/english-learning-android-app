@@ -45,6 +45,10 @@ class RevisionViewModel(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
     
+    // Success messages
+    private val _successMessage = MutableLiveData<String?>()
+    val successMessage: LiveData<String?> = _successMessage
+    
     // Stage statistics
     private val _stageStatistics = MutableLiveData<Map<Int, Int>>()
     val stageStatistics: LiveData<Map<Int, Int>> = _stageStatistics
@@ -264,6 +268,13 @@ class RevisionViewModel(
     }
     
     /**
+     * Clear success message
+     */
+    fun clearSuccessMessage() {
+        _successMessage.value = null
+    }
+    
+    /**
      * Clear answer result and feedback
      */
     fun clearAnswerResult() {
@@ -304,6 +315,37 @@ class RevisionViewModel(
      */
     fun getTotalWordCount(): Int {
         return _stageStatistics.value?.values?.sum() ?: 0
+    }
+    
+    /**
+     * Delete the current word
+     */
+    fun deleteCurrentWord() {
+        val currentWord = _currentWord.value
+        if (currentWord == null) {
+            _errorMessage.value = "No word to delete"
+            return
+        }
+        
+        _isLoading.value = true
+        
+        viewModelScope.launch {
+            try {
+                val result = wordRepository.deleteWord(currentWord)
+                if (result.isSuccess) {
+                    _successMessage.value = "Word deleted successfully"
+                    // Refresh the current stage to update the word list
+                    loadWordsForCurrentStage()
+                    loadStageStatistics()
+                } else {
+                    _errorMessage.value = "Failed to delete word"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error deleting word: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 }
 

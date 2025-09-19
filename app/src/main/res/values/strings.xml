@@ -6,6 +6,15 @@
     <string name="app_subtitle">Learn English with Traditional Chinese</string>
     <string name="dictionary_button">English-Chinese-Traditional</string>
     <string name="revision_button">Revision</string>
+    <string name="delete_all_button">Delete All Words</string>
+    <string name="delete_word_button">Delete Word</string>
+    <string name="delete_all_confirmation">Are you sure you want to delete all saved words? This action cannot be undone.</string>
+    <string name="delete_word_confirmation">Are you sure you want to delete this word?</string>
+    <string name="delete_all_success">All words have been deleted successfully</string>
+    <string name="delete_word_success">Word deleted successfully</string>
+    <string name="delete_failed">Failed to delete words. Please try again.</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
     
     <!-- Dictionary Activity -->
     <string name="search_hint">Enter English word</string>

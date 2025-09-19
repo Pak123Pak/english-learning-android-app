@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -100,6 +101,11 @@ class RevisionActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener {
             finish()
         }
+        
+        // Delete word button click
+        binding.deleteWordButton.setOnClickListener {
+            showDeleteWordConfirmationDialog()
+        }
     }
     
     private fun submitAnswer() {
@@ -171,6 +177,14 @@ class RevisionActivity : AppCompatActivity() {
             }
         }
         
+        // Observe success messages
+        viewModel.successMessage.observe(this) { successMessage ->
+            if (successMessage != null) {
+                Toast.makeText(this, successMessage, Toast.LENGTH_SHORT).show()
+                viewModel.clearSuccessMessage()
+            }
+        }
+        
         // Observe show feedback state
         viewModel.showFeedback.observe(this) { showFeedback ->
             binding.answerFeedbackTextView.visibility = if (showFeedback) View.VISIBLE else View.GONE
@@ -181,6 +195,7 @@ class RevisionActivity : AppCompatActivity() {
         binding.wordCard.visibility = View.VISIBLE
         binding.answerInputLayout.visibility = View.VISIBLE
         binding.submitButton.visibility = View.VISIBLE
+        binding.deleteWordButton.visibility = View.VISIBLE
         binding.submitButton.isEnabled = true
         
         binding.chineseTranslationTextView.text = word.chineseTranslation
@@ -197,6 +212,7 @@ class RevisionActivity : AppCompatActivity() {
         binding.wordCard.visibility = View.GONE
         binding.answerInputLayout.visibility = View.GONE
         binding.submitButton.visibility = View.GONE
+        binding.deleteWordButton.visibility = View.GONE
         binding.progressTextView.visibility = View.GONE
         
         binding.emptyStateLayout.visibility = View.VISIBLE
@@ -244,6 +260,17 @@ class RevisionActivity : AppCompatActivity() {
         super.onResume()
         // Refresh data when returning from dictionary
         viewModel.refreshCurrentStage()
+    }
+    
+    private fun showDeleteWordConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.delete_word_button))
+            .setMessage(getString(R.string.delete_word_confirmation))
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
+                viewModel.deleteCurrentWord()
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
     
     override fun onSupportNavigateUp(): Boolean {
