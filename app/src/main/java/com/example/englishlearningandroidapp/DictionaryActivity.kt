@@ -16,6 +16,7 @@ import com.example.englishlearningandroidapp.ui.dictionary.DefinitionsAdapter
 import com.example.englishlearningandroidapp.ui.dictionary.DictionaryViewModel
 import com.example.englishlearningandroidapp.ui.dictionary.SaveWordState
 import com.example.englishlearningandroidapp.ui.getViewModelFactory
+import com.example.englishlearningandroidapp.utils.hideKeyboard
 
 class DictionaryActivity : AppCompatActivity() {
     
@@ -100,6 +101,7 @@ class DictionaryActivity : AppCompatActivity() {
         val query = binding.searchEditText.text.toString()
         viewModel.searchWord(query)
         // Hide keyboard after search
+        binding.searchEditText.hideKeyboard()
         binding.searchEditText.clearFocus()
     }
     

@@ -17,6 +17,7 @@ import com.example.englishlearningandroidapp.databinding.ActivityRevisionBinding
 import com.example.englishlearningandroidapp.ui.revision.AnswerResult
 import com.example.englishlearningandroidapp.ui.revision.RevisionViewModel
 import com.example.englishlearningandroidapp.ui.getViewModelFactory
+import com.example.englishlearningandroidapp.utils.hideKeyboard
 
 class RevisionActivity : AppCompatActivity() {
     
@@ -110,6 +111,8 @@ class RevisionActivity : AppCompatActivity() {
     
     private fun submitAnswer() {
         val answer = binding.answerEditText.text.toString()
+        // Hide keyboard when submitting
+        binding.answerEditText.hideKeyboard()
         viewModel.submitAnswer(answer)
     }
     
