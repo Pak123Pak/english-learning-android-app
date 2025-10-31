@@ -331,6 +331,88 @@ And the data should remain unchanged
 And I should be able to retry the operation
 ```
 
+#### 3.6 User Story 5: App Distribution and Installation
+
+**Story**: As a user, I want to easily download and install the app from GitHub on my Android device, so that I can start learning English without needing Google Play Store access.
+
+**Acceptance Criteria**:
+
+**AC1: Successful APK Download from GitHub Releases**
+```
+Given I navigate to the GitHub repository releases page
+And there is a published release version (e.g., v1.0.0)
+When I view the release assets
+Then I should see an APK file named "EnglishLearning-v1.0.0.apk"
+And the file size should be approximately 5-20 MB
+And the release should include auto-generated release notes
+And the APK download link should be functional
+```
+
+**AC2: Successful APK Installation on Android Device**
+```
+Given I have downloaded the APK file to my Android device
+And my device runs Android 7.0 (API 24) or higher
+When I tap on the APK file to install
+And I allow installation from unknown sources (if prompted)
+And I proceed through the installation prompts
+Then the app should install successfully within 30 seconds
+And I should see "App installed" confirmation
+And the app icon should appear in my app drawer
+```
+
+**AC3: App Launch After Installation**
+```
+Given I have successfully installed the app
+When I tap the app icon from the app drawer
+Then the app should launch within 2 seconds
+And I should see the main menu screen
+And all navigation options should be visible and functional
+And no crash or error dialogs should appear
+```
+
+**AC4: GitHub Actions Build Success**
+```
+Given code changes are pushed to the main branch
+When GitHub Actions workflow is triggered
+Then the build job should complete successfully within 10 minutes
+And a debug APK artifact should be created
+And the artifact should be available for download for 30 days
+And the workflow status should show as "passing"
+```
+
+**AC5: Automated Release Creation**
+```
+Given a new version tag is pushed (e.g., v1.0.1)
+When the release workflow is triggered
+Then a GitHub release should be created automatically
+And the release APK should be attached to the release
+And the APK should be named with the correct version
+And release notes should be auto-generated from commits
+And the release should be marked as "Latest"
+```
+
+**AC6: No Sensitive Data Exposure**
+```
+Given the repository is public on GitHub
+When reviewing all committed files
+Then no API keys should be present in the codebase
+And no local.properties file should be committed
+And no signing keystore files should be committed
+And no personal information should be exposed
+And all build artifacts should be gitignored
+```
+
+**AC7: README Installation Instructions**
+```
+Given a new user visits the GitHub repository
+When they view the README.md file
+Then they should see clear download instructions
+And system requirements should be listed
+And installation steps should be numbered and detailed
+And links to releases and actions should be functional
+And screenshots or instructions for enabling unknown sources should be included
+```
+
 ### 4. Acceptance Test Implementation
 
 #### 4.1 Test Structure Overview

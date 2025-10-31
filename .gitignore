@@ -5,6 +5,9 @@
 *.apk
 *.aab
 
+# Exception: Allow workflow files
+!.github/
+
 # Files for the ART/Dalvik VM
 *.dex
 
@@ -232,7 +235,7 @@ R.java
 # PROJECT SPECIFIC EXCLUSIONS
 # ============================================
 
-# Root-level markdown files (except README.md)
+# Root-level markdown files (except README.md and DEPLOYMENT_GUIDE.md)
 *.md
 !README.md
 
