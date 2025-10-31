@@ -43,7 +43,7 @@
     <string name="network_error">No internet connection. Please check your connection and try again.</string>
     <string name="word_not_found">Word not found. Please try a different word.</string>
     <string name="validation_empty_search">Please enter a word to search</string>
-    <string name="progress_format">Word %d of %d</string>
+    <string name="progress_format">Word %1$d of %2$d</string>
     
     <!-- Revision Stages -->
     <string-array name="revision_stages">

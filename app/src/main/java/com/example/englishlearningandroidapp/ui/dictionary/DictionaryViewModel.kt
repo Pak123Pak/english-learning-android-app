@@ -42,8 +42,8 @@ class DictionaryViewModel(
     val searchQuery: LiveData<String> = _searchQuery
     
     // The actual word returned from API (base form)
-    private val _actualWord = MutableLiveData<String>()
-    val actualWord: LiveData<String> = _actualWord
+    private val _actualWord = MutableLiveData<String?>()
+    val actualWord: LiveData<String?> = _actualWord
     
     // Loading state
     private val _isLoading = MutableLiveData<Boolean>()
