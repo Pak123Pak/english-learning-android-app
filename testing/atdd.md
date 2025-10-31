@@ -118,6 +118,7 @@ Given I have selected a revision stage with available words
 When the revision starts
 Then I should see:
   - The Traditional Chinese translation of the word
+  - The part of speech (word class) of the word
   - An example sentence with the English word replaced by "___"
   - An input field to enter the English word
   - A submit button
@@ -575,6 +576,7 @@ class RevisionSystemAcceptanceTests {
         // When the revision starts
         // Then I should see all required elements
         revisionPage.verifyChineseTranslationDisplayed("廚師")
+        revisionPage.verifyPartOfSpeechDisplayed("noun")
         revisionPage.verifyExampleSentenceDisplayed("She's a wonderful ___.")
         revisionPage.verifyAnswerInputExists()
         revisionPage.verifySubmitButtonExists()

@@ -199,6 +199,7 @@ class RevisionActivity : AppCompatActivity() {
         binding.submitButton.isEnabled = true
         
         binding.chineseTranslationTextView.text = word.chineseTranslation
+        binding.partOfSpeechTextView.text = word.partOfSpeech
         binding.exampleSentenceTextView.text = word.blankExampleSentence
         
         // Clear previous answer and feedback

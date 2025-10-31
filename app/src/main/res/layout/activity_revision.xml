@@ -74,6 +74,19 @@
             android:padding="20dp">
 
             <TextView
+                android:id="@+id/partOfSpeechTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="noun"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:textColor="?attr/colorSecondary"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/part_of_speech_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp" />
+
+            <TextView
                 android:id="@+id/translationLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

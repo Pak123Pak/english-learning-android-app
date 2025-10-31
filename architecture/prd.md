@@ -100,7 +100,7 @@ This Android application helps users learn English vocabulary through Traditiona
 
 - **Revision Flow**:
   - Display first word from selected stage
-  - Show Chinese translation + example sentence with blank
+  - Show Chinese translation + part of speech + example sentence with blank
   - User inputs English word (case-insensitive)
   - Show result feedback (correct/incorrect) and wait for user confirmation
   - User clicks "Continue" button to proceed to next word
@@ -166,7 +166,7 @@ This Android application helps users learn English vocabulary through Traditiona
 **Revision Activity**:
 - Back button to main menu
 - Stage selector (dropdown)
-- Word display area
+- Word display area (Chinese translation, part of speech, example sentence)
 - Answer input field
 - Submit button
 - Answer feedback area

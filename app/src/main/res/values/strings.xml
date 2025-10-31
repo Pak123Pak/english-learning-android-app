@@ -25,6 +25,7 @@
     
     <!-- Revision Activity -->
     <string name="stage_selection_label">Select Revision Stage:</string>
+    <string name="part_of_speech_label">Word Class:</string>
     <string name="translation_label">Chinese Translation:</string>
     <string name="example_label">Example:</string>
     <string name="answer_hint">Enter English word</string>

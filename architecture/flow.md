@@ -37,7 +37,8 @@ graph TD
     R -->|Yes| T[Display Word Info]
     
     T --> U[Show Chinese Translation]
-    U --> V[Show Example with Blank]
+    U --> UP[Show Part of Speech]
+    UP --> V[Show Example with Blank]
     V --> DW[Delete Word Button]
     V --> W[User Input English Word]
     W --> X[Submit Answer]

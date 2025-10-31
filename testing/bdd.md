@@ -107,6 +107,7 @@ Feature: Vocabulary Revision System
     Then the stage selector should default to "Not revised"
     And the first word from "Not revised" stage should be displayed
     And the Chinese translation should be visible
+    And the part of speech should be visible
     And an example sentence with a blank should be shown
     And an input field for the English word should be available
 

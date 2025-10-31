@@ -232,17 +232,14 @@ R.java
 # PROJECT SPECIFIC EXCLUSIONS
 # ============================================
 
-# Root-level markdown files (except README.md and specific documentation)
+# Root-level markdown files (except README.md)
 *.md
 !README.md
-!PROJECT_PLANNING.md
-!DEBUG_LOGGING.md
-!SECURITY_RECOMMENDATIONS.md
 
-# Allow architecture and testing documentation
-!architecture/
-!architecture/*.md
-!architecture/*.plantuml
+# Ignore architecture documentation folder
+architecture/
+
+# Allow testing documentation
 !testing/
 !testing/*.md
 
