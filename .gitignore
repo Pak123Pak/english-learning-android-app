@@ -232,13 +232,19 @@ R.java
 # PROJECT SPECIFIC EXCLUSIONS
 # ============================================
 
-# Architecture and testing documentation folders
-architecture/
-testing/
-
-# Root-level markdown files (except README.md)
+# Root-level markdown files (except README.md and specific documentation)
 *.md
 !README.md
+!PROJECT_PLANNING.md
+!DEBUG_LOGGING.md
+!SECURITY_RECOMMENDATIONS.md
+
+# Allow architecture and testing documentation
+!architecture/
+!architecture/*.md
+!architecture/*.plantuml
+!testing/
+!testing/*.md
 
 # If you add actual API keys in the future, make sure to exclude them:
 # app/src/main/res/values/api_keys.xml

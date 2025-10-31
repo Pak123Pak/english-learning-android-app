@@ -41,6 +41,10 @@ class DictionaryViewModel(
     private val _searchQuery = MutableLiveData<String>()
     val searchQuery: LiveData<String> = _searchQuery
     
+    // The actual word returned from API (base form)
+    private val _actualWord = MutableLiveData<String>()
+    val actualWord: LiveData<String> = _actualWord
+    
     // Loading state
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -100,6 +104,10 @@ class DictionaryViewModel(
                         debugLog("API Call Success!")
                         logApiResponse(result.data)
                         
+                        // Store the actual word from API response (e.g., "apple" instead of "apples")
+                        _actualWord.value = result.data.word
+                        debugLog("Actual word from API: '${result.data.word}' (searched: '$trimmedQuery')")
+                        
                         val definitions = result.data.getMainDefinitions()
                         if (definitions.isNotEmpty()) {
                             debugLog("Found ${definitions.size} definitions")
@@ -158,17 +166,17 @@ class DictionaryViewModel(
      * Save the selected word and definition to database
      */
     fun saveSelectedWord() {
-        val currentQuery = _searchQuery.value
         val currentDefinition = _selectedDefinition.value
+        val wordToSave = _actualWord.value // Use the actual word from API (base form)
         
-        if (currentQuery.isNullOrBlank() || currentDefinition == null) {
+        if (wordToSave.isNullOrBlank() || currentDefinition == null) {
             _saveWordState.value = SaveWordState.Error("No word or definition selected")
             return
         }
         
         // Validate word before saving
         val validationResult = ValidationUtils.validateWordForSaving(
-            currentQuery,
+            wordToSave,
             currentDefinition.translation
         )
         
@@ -183,12 +191,12 @@ class DictionaryViewModel(
         
         viewModelScope.launch {
             try {
-                // Create example sentence with blank
-                val exampleSentence = currentDefinition.example ?: "Example with ${currentQuery}."
-                val blankExample = StringUtils.createBlankSentence(exampleSentence, currentQuery)
+                // Create example sentence with blank using the actual word (base form)
+                val exampleSentence = currentDefinition.example ?: "Example with ${wordToSave}."
+                val blankExample = StringUtils.createBlankSentence(exampleSentence, wordToSave)
                 
                 val word = Word(
-                    englishWord = currentQuery,
+                    englishWord = wordToSave, // Save the actual word from API (e.g., "apple" not "apples")
                     chineseTranslation = currentDefinition.translation,
                     partOfSpeech = currentDefinition.partOfSpeech,
                     exampleSentence = exampleSentence,
@@ -234,6 +242,7 @@ class DictionaryViewModel(
         _searchResults.value = emptyList()
         _selectedDefinition.value = null
         _searchQuery.value = ""
+        _actualWord.value = null
         _errorMessage.value = null
         _searchValidationError.value = null
         _saveWordState.value = SaveWordState.Idle
@@ -258,7 +267,7 @@ class DictionaryViewModel(
      * @return True if word and definition are selected
      */
     fun isSaveButtonEnabled(): Boolean {
-        return !_searchQuery.value.isNullOrBlank() && 
+        return !_actualWord.value.isNullOrBlank() && 
                _selectedDefinition.value != null &&
                _saveWordState.value !is SaveWordState.Saving
     }

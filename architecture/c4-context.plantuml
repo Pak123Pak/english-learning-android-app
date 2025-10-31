@@ -1,0 +1,41 @@
+@startuml C4-Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title English Learning App - System Context Diagram
+
+Person(user, "English Learner", "Traditional Chinese speaker learning English vocabulary")
+
+System(englishApp, "English Learning App", "Android application for learning English vocabulary with spaced repetition")
+
+System_Ext(cambridgeAPI, "Cambridge Dictionary API", "External API providing English to Traditional Chinese translations")
+
+System_Ext(androidSystem, "Android OS", "Operating system providing device services and storage")
+
+Rel(user, englishApp, "Uses", "Searches words, practices vocabulary")
+Rel(englishApp, cambridgeAPI, "Fetches definitions", "HTTPS/REST API")
+Rel(englishApp, androidSystem, "Uses", "Local storage, UI framework")
+
+note right of englishApp
+  **Primary Features:**
+  - Word search with Traditional Chinese translations
+  - 6-stage spaced repetition system
+  - Offline vocabulary storage
+  - Progress tracking
+end note
+
+note right of cambridgeAPI
+  **API Base URL:**
+  https://dictionary-api.eliaschen.dev/
+  
+  **API Endpoint:**
+  /api/dictionary/en-tw/{word}
+  
+  **Response includes:**
+  - Word definitions with Traditional Chinese translations
+  - Part of speech information
+  - Example sentences (English + Chinese)
+  - Pronunciation data with audio URLs
+  - Verb forms (if applicable)
+end note
+
+@enduml

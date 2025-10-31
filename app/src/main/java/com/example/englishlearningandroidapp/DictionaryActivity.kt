@@ -116,8 +116,12 @@ class DictionaryActivity : AppCompatActivity() {
         
         // Observe selected definition
         viewModel.selectedDefinition.observe(this) { definition ->
-            binding.saveButton.isEnabled = definition != null && 
-                !binding.searchEditText.text.isNullOrBlank()
+            binding.saveButton.isEnabled = viewModel.isSaveButtonEnabled()
+        }
+        
+        // Observe actual word (base form from API)
+        viewModel.actualWord.observe(this) { actualWord ->
+            binding.saveButton.isEnabled = viewModel.isSaveButtonEnabled()
         }
         
         // Observe loading state

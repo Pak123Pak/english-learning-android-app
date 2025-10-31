@@ -202,7 +202,7 @@ class ApiRepository(
             }
             
             val adaptedResponse = WordDefinitionResponse(
-                word = word,
+                word = freeDictionaryData.word ?: word, // Use the word from API response, fallback to search term
                 phonetic = freeDictionaryData.phonetic,
                 phonetics = freeDictionaryData.phonetics,
                 definitions = definitions,
@@ -272,7 +272,7 @@ class ApiRepository(
             } ?: emptyList()
             
             val adaptedResponse = WordDefinitionResponse(
-                word = word,
+                word = cambridgeData.word, // Use the actual word from API response (base form)
                 pos = cambridgeData.pos,
                 phonetic = cambridgeData.pronunciation?.firstOrNull()?.pron,
                 phonetics = phonetics,

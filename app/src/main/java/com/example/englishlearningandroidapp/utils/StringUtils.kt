@@ -8,7 +8,7 @@ object StringUtils {
     /**
      * Create a blank sentence by replacing the word with "___"
      * @param sentence The original sentence
-     * @param word The word to replace
+     * @param word The word to replace (base form)
      * @return Sentence with word replaced by blank
      */
     fun createBlankSentence(sentence: String, word: String): String {
@@ -16,22 +16,74 @@ object StringUtils {
             return "Example with ___."
         }
         
-        // Try different variations of the word in the sentence
-        val variations = listOf(
-            word.lowercase(),
-            word.uppercase(),
-            word.replaceFirstChar { it.uppercase() },
-            word.replaceFirstChar { it.lowercase() }
-        )
+        // Create a regex pattern that matches the word with word boundaries
+        // This ensures we match whole words only, not parts of other words
+        val pattern = "\\b${Regex.escape(word)}\\b".toRegex(RegexOption.IGNORE_CASE)
         
-        var result = sentence
-        for (variation in variations) {
-            result = result.replace(variation, "___", ignoreCase = false)
+        // Replace all occurrences of the word (case-insensitive) with blank
+        var result = pattern.replace(sentence, "___")
+        
+        // If no replacement was made, the word might not be in the sentence exactly
+        // In that case, return the original sentence with a note
+        if (result == sentence) {
+            // Try to find inflected forms (plural, past tense, etc.)
+            result = replaceInflectedForms(sentence, word)
         }
         
-        // If no replacement was made, try ignoreCase = true
-        if (result == sentence) {
-            result = sentence.replace(word, "___", ignoreCase = true)
+        return result
+    }
+    
+    /**
+     * Attempt to replace inflected forms of a word in a sentence
+     * @param sentence The sentence
+     * @param baseWord The base form of the word
+     * @return Sentence with inflected forms replaced
+     */
+    private fun replaceInflectedForms(sentence: String, baseWord: String): String {
+        var result = sentence
+        
+        // Common inflection patterns
+        val inflections = mutableListOf<String>()
+        
+        // Add the base word itself
+        inflections.add(baseWord)
+        
+        // Plural forms
+        inflections.add("${baseWord}s")        // book -> books
+        inflections.add("${baseWord}es")       // box -> boxes
+        if (baseWord.endsWith("y")) {
+            inflections.add("${baseWord.dropLast(1)}ies")  // baby -> babies
+        }
+        
+        // Past tense forms
+        inflections.add("${baseWord}ed")       // cook -> cooked
+        if (baseWord.endsWith("e")) {
+            inflections.add("${baseWord}d")    // bake -> baked
+        }
+        if (baseWord.endsWith("y")) {
+            inflections.add("${baseWord.dropLast(1)}ied")  // carry -> carried
+        }
+        
+        // Present tense (third person singular)
+        inflections.add("${baseWord}s")
+        if (baseWord.endsWith("y")) {
+            inflections.add("${baseWord.dropLast(1)}ies")
+        }
+        
+        // Continuous forms
+        inflections.add("${baseWord}ing")      // cook -> cooking
+        if (baseWord.endsWith("e")) {
+            inflections.add("${baseWord.dropLast(1)}ing")  // bake -> baking
+        }
+        
+        // Try to replace each inflected form
+        for (inflection in inflections.distinct()) {
+            val pattern = "\\b${Regex.escape(inflection)}\\b".toRegex(RegexOption.IGNORE_CASE)
+            result = pattern.replace(result, "___")
+            // If we found a match, stop looking
+            if (result != sentence) {
+                break
+            }
         }
         
         return result

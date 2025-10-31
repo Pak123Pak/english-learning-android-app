@@ -1,0 +1,135 @@
+@startuml C4-Code
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title English Learning App - Code Level Diagram (DictionaryViewModel Detail)
+
+Component_Boundary(dictionaryViewModel, "DictionaryViewModel") {
+    ' Public Interface
+    class DictionaryViewModelClass <<ViewModel>> {
+        - wordRepository: WordRepository
+        - apiRepository: ApiRepository
+        - _searchResults: MutableLiveData<List<Definition>>
+        - _selectedDefinition: MutableLiveData<Definition?>
+        - _saveState: MutableLiveData<SaveWordState>
+        - _loading: MutableLiveData<Boolean>
+        
+        + searchWord(query: String): Unit
+        + selectDefinition(definition: Definition): Unit
+        + saveSelectedWord(): Unit
+        + clearSearch(): Unit
+        + getSearchResults(): LiveData<List<Definition>>
+        + getSelectedDefinition(): LiveData<Definition?>
+        + getSaveState(): LiveData<SaveWordState>
+        + getLoadingState(): LiveData<Boolean>
+    }
+    
+    ' Internal State Classes
+    class SaveWordState <<SealedClass>> {
+        + object Idle
+        + object Saving
+        + data class Success(word: Word)
+        + data class Error(message: String)
+    }
+    
+    ' Private Methods
+    class PrivateMethods {
+        - handleApiResponse(response: Result<WordDefinitionResponse>): Unit
+        - createWordFromDefinition(query: String, definition: Definition): Word
+        - validateInputs(): Boolean
+        - handleError(throwable: Throwable): Unit
+        - updateLoadingState(isLoading: Boolean): Unit
+    }
+}
+
+' External Dependencies
+Component(wordRepository, "WordRepository", "Repository", "Local data operations")
+Component(apiRepository, "ApiRepository", "Repository", "API communication")
+
+' Data Classes
+class Definition <<DataClass>> {
+    + translation: String
+    + partOfSpeech: String
+    + example: String
+    + synonyms: List<String>
+    + antonyms: List<String>
+}
+
+class Word <<Entity>> {
+    + id: Long
+    + englishWord: String
+    + chineseTranslation: String
+    + partOfSpeech: String
+    + exampleSentence: String
+    + blankExampleSentence: String
+    + revisionStage: Int
+    + createdAt: Long
+    + lastRevisedAt: Long
+}
+
+class WordDefinitionResponse <<ApiResponse>> {
+    + word: String
+    + phonetic: String
+    + definitions: List<Definition>
+    + origin: String
+}
+
+' Relationships
+DictionaryViewModelClass --> SaveWordState : "uses"
+DictionaryViewModelClass --> PrivateMethods : "contains"
+DictionaryViewModelClass --> wordRepository : "depends on"
+DictionaryViewModelClass --> apiRepository : "depends on"
+DictionaryViewModelClass --> Definition : "handles"
+DictionaryViewModelClass --> Word : "creates"
+
+apiRepository --> WordDefinitionResponse : "returns"
+WordDefinitionResponse --> Definition : "contains"
+PrivateMethods --> Word : "creates"
+
+note right of DictionaryViewModelClass
+  **Key Methods Flow:**
+  
+  1. searchWord(query)
+     - Validate input
+     - Set loading state
+     - Call apiRepository
+     - Handle response
+  
+  2. selectDefinition(def)
+     - Store selection
+     - Enable save functionality
+  
+  3. saveSelectedWord()
+     - Create Word entity
+     - Save to repository
+     - Update save state
+end note
+
+note right of SaveWordState
+  **State Management:**
+  
+  UI observes this state to:
+  - Show loading indicators
+  - Display success messages
+  - Handle error scenarios
+  - Enable/disable buttons
+end note
+
+note right of PrivateMethods
+  **Helper Functions:**
+  
+  - Input validation
+  - Error handling
+  - State management
+  - Data transformation
+  - Business logic
+end note
+
+' Method Call Flow
+note bottom
+  **Typical Flow:**
+  searchWord() -> apiRepository.fetchDefinition() -> handleApiResponse() -> 
+  selectDefinition() -> saveSelectedWord() -> wordRepository.insert() -> 
+  Success/Error state update
+end note
+
+@enduml
