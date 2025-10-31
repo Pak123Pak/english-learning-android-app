@@ -107,6 +107,11 @@ class RevisionActivity : AppCompatActivity() {
         binding.deleteWordButton.setOnClickListener {
             showDeleteWordConfirmationDialog()
         }
+        
+        // Hint button click
+        binding.hintButton.setOnClickListener {
+            viewModel.revealNextLetter()
+        }
     }
     
     private fun submitAnswer() {
@@ -192,18 +197,31 @@ class RevisionActivity : AppCompatActivity() {
         viewModel.showFeedback.observe(this) { showFeedback ->
             binding.answerFeedbackTextView.visibility = if (showFeedback) View.VISIBLE else View.GONE
         }
+        
+        // Observe displayed example sentence (with hints)
+        viewModel.displayedExampleSentence.observe(this) { displayedSentence ->
+            if (displayedSentence != null) {
+                binding.exampleSentenceTextView.text = displayedSentence
+            }
+        }
+        
+        // Observe hint button enabled state
+        viewModel.isHintButtonEnabled.observe(this) { isEnabled ->
+            binding.hintButton.isEnabled = isEnabled
+        }
     }
     
     private fun showWord(word: com.example.englishlearningandroidapp.data.database.Word) {
         binding.wordCard.visibility = View.VISIBLE
         binding.answerInputLayout.visibility = View.VISIBLE
+        binding.hintButton.visibility = View.VISIBLE
         binding.submitButton.visibility = View.VISIBLE
         binding.deleteWordButton.visibility = View.VISIBLE
         binding.submitButton.isEnabled = true
         
         binding.chineseTranslationTextView.text = word.chineseTranslation
         binding.partOfSpeechTextView.text = word.partOfSpeech
-        binding.exampleSentenceTextView.text = word.blankExampleSentence
+        // Note: exampleSentenceTextView will be updated by the displayedExampleSentence observer
         
         // Clear previous answer and feedback
         binding.answerEditText.text?.clear()
@@ -215,6 +233,7 @@ class RevisionActivity : AppCompatActivity() {
     private fun showEmptyState() {
         binding.wordCard.visibility = View.GONE
         binding.answerInputLayout.visibility = View.GONE
+        binding.hintButton.visibility = View.GONE
         binding.submitButton.visibility = View.GONE
         binding.deleteWordButton.visibility = View.GONE
         binding.progressTextView.visibility = View.GONE

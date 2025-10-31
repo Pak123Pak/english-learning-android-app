@@ -29,6 +29,7 @@
     <string name="translation_label">Chinese Translation:</string>
     <string name="example_label">Example:</string>
     <string name="answer_hint">Enter English word</string>
+    <string name="hint_button">💡 Show Hint</string>
     <string name="submit_button">Submit Answer</string>
     <string name="continue_next_word">Continue to Next Word</string>
     <string name="back_to_main">← Back to Main</string>

@@ -61,11 +61,25 @@ class RevisionViewModel(
     private val _showFeedback = MutableLiveData<Boolean>()
     val showFeedback: LiveData<Boolean> = _showFeedback
     
+    // Hint state - number of letters revealed
+    private val _revealedLettersCount = MutableLiveData<Int>()
+    val revealedLettersCount: LiveData<Int> = _revealedLettersCount
+    
+    // Current displayed example sentence (with partially revealed word)
+    private val _displayedExampleSentence = MutableLiveData<String>()
+    val displayedExampleSentence: LiveData<String> = _displayedExampleSentence
+    
+    // Hint button enabled state
+    private val _isHintButtonEnabled = MutableLiveData<Boolean>()
+    val isHintButtonEnabled: LiveData<Boolean> = _isHintButtonEnabled
+    
     init {
         _currentStage.value = 0 // Start with "Not revised"
         _currentPosition.value = 0
         _isLoading.value = false
         _showFeedback.value = false
+        _revealedLettersCount.value = 0
+        _isHintButtonEnabled.value = true
         loadStageStatistics()
         loadWordsForCurrentStage()
     }
@@ -101,6 +115,7 @@ class RevisionViewModel(
                     _currentWord.value = words.first()
                     _currentPosition.value = 1
                     updateProgressText(1, words.size)
+                    resetHintState()
                 } else {
                     _currentWord.value = null
                     _currentPosition.value = 0
@@ -205,6 +220,7 @@ class RevisionViewModel(
             _currentWord.value = words[nextPosition - 1]
             _currentPosition.value = nextPosition
             updateProgressText(nextPosition, words.size)
+            resetHintState()
         } else {
             // Reload the stage (words may have moved)
             loadWordsForCurrentStage()
@@ -345,6 +361,60 @@ class RevisionViewModel(
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+    
+    /**
+     * Reset hint state when showing a new word
+     */
+    private fun resetHintState() {
+        _revealedLettersCount.value = 0
+        _isHintButtonEnabled.value = true
+        updateDisplayedSentence()
+    }
+    
+    /**
+     * Reveal one more letter in the blank of the example sentence
+     */
+    fun revealNextLetter() {
+        val currentWord = _currentWord.value ?: return
+        val currentRevealed = _revealedLettersCount.value ?: 0
+        val wordLength = currentWord.englishWord.length
+        
+        // Only reveal if there are more letters to reveal
+        if (currentRevealed < wordLength) {
+            val newRevealedCount = currentRevealed + 1
+            _revealedLettersCount.value = newRevealedCount
+            
+            // Disable hint button if all letters are now revealed
+            if (newRevealedCount >= wordLength) {
+                _isHintButtonEnabled.value = false
+            }
+            
+            updateDisplayedSentence()
+        }
+    }
+    
+    /**
+     * Update the displayed example sentence based on revealed letters count
+     */
+    private fun updateDisplayedSentence() {
+        val currentWord = _currentWord.value ?: return
+        val revealedCount = _revealedLettersCount.value ?: 0
+        
+        if (revealedCount == 0) {
+            // No letters revealed, show original blank sentence
+            _displayedExampleSentence.value = currentWord.blankExampleSentence
+        } else {
+            // Replace the blank with partially revealed word
+            val englishWord = currentWord.englishWord.lowercase()
+            val revealedPart = englishWord.substring(0, revealedCount.coerceAtMost(englishWord.length))
+            val blankPart = if (revealedCount < englishWord.length) "_" else ""
+            val partialWord = revealedPart + blankPart
+            
+            // Replace the blank (represented by multiple underscores or _) with partial word
+            val displayedSentence = currentWord.blankExampleSentence.replace(Regex("_{1,}"), partialWord)
+            _displayedExampleSentence.value = displayedSentence
         }
     }
 }
