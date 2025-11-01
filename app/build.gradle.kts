@@ -31,12 +31,18 @@ android {
     
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Enable code minification and obfuscation for security
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            // Disable minification for easier debugging
+            isMinifyEnabled = false
         }
     }
     compileOptions {
