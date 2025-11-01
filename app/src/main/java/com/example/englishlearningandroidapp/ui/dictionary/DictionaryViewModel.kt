@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.englishlearningandroidapp.data.api.ApiException
 import com.example.englishlearningandroidapp.data.api.Definition
 import com.example.englishlearningandroidapp.data.api.NetworkResult
 import com.example.englishlearningandroidapp.data.api.WordDefinitionResponse
@@ -121,7 +122,14 @@ class DictionaryViewModel(
                     is NetworkResult.Error -> {
                         debugLog("API Call Failed: ${result.message}")
                         debugLog("Exception: ${result.exception}")
-                        _errorMessage.value = result.message ?: "Failed to search word"
+                        
+                        // Check if it's a network connectivity issue
+                        val errorMsg = when (result.exception) {
+                            is ApiException.NetworkException -> "No Internet"
+                            is ApiException.TimeoutException -> "Request timeout. Please try again."
+                            else -> result.message ?: "Failed to search word"
+                        }
+                        _errorMessage.value = errorMsg
                     }
                     is NetworkResult.Loading -> {
                         debugLog("API Call Loading...")

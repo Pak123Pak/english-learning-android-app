@@ -2,7 +2,7 @@
 
 An Android application for learning English vocabulary with Traditional Chinese translations, featuring spaced repetition and progressive revision stages.
 
-## 📥 Download & Installation
+## Download & Installation
 
 1. Go to the [Releases](../../releases) page
 2. Download the latest `EnglishLearning-vX.X.X.apk` file
@@ -16,24 +16,6 @@ An Android application for learning English vocabulary with Traditional Chinese 
 - Android 7.0 (API 24) or higher
 - Internet connection for dictionary lookups
 - Approximately 5-10MB storage space
-
-## Privacy & Security
-
-### Privacy
-- **Permissions**: Internet access only (required for dictionary API)
-- **Data Collection**: None - all data stays on your device
-- **Analytics**: Not implemented - no tracking or profiling
-- **Third-party Services**: Cambridge Dictionary API only (no authentication required)
-- **Local Storage**: All vocabulary data stored locally using Room database
-- **No Cloud Sync**: Your data never leaves your device
-
-### Security Features
-- ✅ **HTTPS-Only**: All network connections use HTTPS
-- ✅ **Code Obfuscation**: Release builds use ProGuard/R8 minification
-- ✅ **No Logging**: Debug logs removed in release builds
-- ✅ **No Backups**: Backup disabled to prevent data extraction
-- ✅ **Minimal Permissions**: Only internet access required
-- ✅ **Open Source**: Code is publicly available for security review
 
 ## How to Use
 
@@ -49,6 +31,24 @@ An Android application for learning English vocabulary with Traditional Chinese 
    - Type the correct English word based on the Chinese definition
    - Use hints if you get stuck
    - Progress through stages as you improve
+
+## Privacy & Security
+
+### Privacy
+- **Permissions**: Internet access only (required for dictionary API)
+- **Data Collection**: None - all data stays on your device
+- **Analytics**: Not implemented - no tracking or profiling
+- **Third-party Services**: Cambridge Dictionary API only (no authentication required)
+- **Local Storage**: All vocabulary data stored locally using Room database
+- **No Cloud Sync**: Your data never leaves your device
+
+### Security Features
+- **HTTPS-Only**: All network connections use HTTPS
+- **Code Obfuscation**: Release builds use ProGuard/R8 minification
+- **No Logging**: Debug logs removed in release builds
+- **No Backups**: Backup disabled to prevent data extraction
+- **Minimal Permissions**: Only internet access required
+- **Open Source**: Code is publicly available for security review
 
 ## Support
 

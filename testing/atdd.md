@@ -76,7 +76,7 @@ And the search field should be highlighted in red
 ```
 Given there is no internet connection
 When I search for a word
-Then I should see the message "No internet connection. Please check your connection and try again."
+Then I should see the message "No Internet"
 And I should see a "Retry" button
 When I tap "Retry" after connection is restored
 Then the search should be performed automatically
@@ -550,7 +550,7 @@ class WordSearchAcceptanceTests {
         dictionaryPage.clickSearchButton()
         
         // Then I should see the network error message
-        dictionaryPage.verifyErrorMessage("No internet connection. Please check your connection and try again.")
+        dictionaryPage.verifyErrorMessage("No Internet")
         
         // And I should see a "Retry" button
         dictionaryPage.verifyRetryButtonVisible()

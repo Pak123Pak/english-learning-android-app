@@ -143,6 +143,42 @@ class DictionaryViewModelTest {
         val saveState = viewModel.getSaveState().getOrAwaitValue()
         Truth.assertThat(saveState).isInstanceOf(SaveWordState.Success::class.java)
     }
+    
+    @Test
+    fun `searchWord with network error should show no internet message`() = runTest {
+        // Arrange
+        val query = "cook"
+        val networkException = ApiException.NetworkException("No internet connection")
+        val errorResult = NetworkResult.Error<WordDefinitionResponse>(networkException, "Network error")
+        
+        whenever(apiRepository.fetchWordDefinition(query))
+            .thenReturn(errorResult)
+        
+        // Act
+        viewModel.searchWord(query)
+        
+        // Assert
+        val errorMessage = viewModel.getErrorMessage().getOrAwaitValue()
+        Truth.assertThat(errorMessage).isEqualTo("No Internet")
+    }
+    
+    @Test
+    fun `searchWord with timeout error should show timeout message`() = runTest {
+        // Arrange
+        val query = "cook"
+        val timeoutException = ApiException.TimeoutException("Request timeout")
+        val errorResult = NetworkResult.Error<WordDefinitionResponse>(timeoutException, "Timeout error")
+        
+        whenever(apiRepository.fetchWordDefinition(query))
+            .thenReturn(errorResult)
+        
+        // Act
+        viewModel.searchWord(query)
+        
+        // Assert
+        val errorMessage = viewModel.getErrorMessage().getOrAwaitValue()
+        Truth.assertThat(errorMessage).isEqualTo("Request timeout. Please try again.")
+    }
 }
 ```
 

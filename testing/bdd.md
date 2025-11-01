@@ -60,7 +60,7 @@ Feature: Word Search and Definition Selection
     When the user enters "cook" in the search field
     And the user taps the search button
     Then an error message should be displayed
-    And the error message should say "No internet connection"
+    And the error message should say "No Internet"
     And the user should see an option to retry
 
   Scenario: Search for a word that doesn't exist
@@ -514,7 +514,7 @@ class DictionarySearchSteps {
             .perform(click())
         
         // Then an error message should be displayed
-        onView(withText("No internet connection"))
+        onView(withText("No Internet"))
             .check(matches(isDisplayed()))
         
         // And the user should see an option to retry
