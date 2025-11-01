@@ -73,6 +73,15 @@ class ApiRepository(
                 }
             } else {
                 debugLog("Cambridge API FAILED for word: '$word'")
+                // Check if it's a network error
+                if (cambridgeResult is NetworkResult.Error) {
+                    val exception = cambridgeResult.exception
+                    if (exception is ApiException.NetworkException || exception is ApiException.TimeoutException) {
+                        debugLog("Cambridge API failed due to network issue, returning immediately")
+                        debugLog("=== API REPOSITORY FETCH COMPLETED (NETWORK ERROR) ===")
+                        return@withContext cambridgeResult
+                    }
+                }
             }
             
             // Fallback to Free Dictionary API
@@ -88,9 +97,18 @@ class ApiRepository(
                 }
             } else {
                 debugLog("Free Dictionary API FAILED for word: '$word'")
+                // Check if it's a network error
+                if (fallbackResult is NetworkResult.Error) {
+                    val exception = fallbackResult.exception
+                    if (exception is ApiException.NetworkException || exception is ApiException.TimeoutException) {
+                        debugLog("Free Dictionary API also failed due to network issue")
+                        debugLog("=== API REPOSITORY FETCH COMPLETED (NETWORK ERROR) ===")
+                        return@withContext fallbackResult
+                    }
+                }
             }
             
-            // Both APIs failed
+            // Both APIs failed (but not due to network issues)
             debugLog("BOTH APIs failed for word: '$word'")
             debugLog("=== API REPOSITORY FETCH COMPLETED (FAILED) ===")
             NetworkResult.Error(

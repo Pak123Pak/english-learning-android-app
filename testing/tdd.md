@@ -182,7 +182,97 @@ class DictionaryViewModelTest {
 }
 ```
 
-#### 4.2 RevisionViewModel Tests
+#### 4.2 ApiRepository Tests
+
+```kotlin
+class ApiRepositoryTest {
+    
+    private lateinit var mockWebServer: MockWebServer
+    private lateinit var cambridgeApiService: DictionaryApiService
+    private lateinit var freeDictionaryApiService: FreeDictionaryApiService
+    private lateinit var apiRepository: ApiRepository
+    
+    @Before
+    fun setup() {
+        mockWebServer = MockWebServer()
+        mockWebServer.start()
+        
+        val retrofit = Retrofit.Builder()
+            .baseUrl(mockWebServer.url("/"))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        
+        cambridgeApiService = retrofit.create(DictionaryApiService::class.java)
+        freeDictionaryApiService = retrofit.create(FreeDictionaryApiService::class.java)
+        apiRepository = ApiRepository(cambridgeApiService, freeDictionaryApiService)
+    }
+    
+    @After
+    fun tearDown() {
+        mockWebServer.shutdown()
+    }
+    
+    @Test
+    fun `fetchWordDefinition returns NetworkException when no internet`() = runTest {
+        // Arrange - simulate no network by disconnecting
+        mockWebServer.enqueue(
+            MockResponse()
+                .setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)
+        )
+        
+        // Act
+        val result = apiRepository.fetchWordDefinition("cook")
+        
+        // Assert
+        Truth.assertThat(result.isError()).isTrue()
+        Truth.assertThat(result.getErrorOrNull()).isInstanceOf(ApiException.NetworkException::class.java)
+    }
+    
+    @Test
+    fun `fetchWordDefinition returns NetworkException when both APIs fail due to network`() = runTest {
+        // Arrange - both APIs fail due to network issues
+        mockWebServer.enqueue(
+            MockResponse()
+                .setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)
+        )
+        mockWebServer.enqueue(
+            MockResponse()
+                .setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)
+        )
+        
+        // Act
+        val result = apiRepository.fetchWordDefinition("cook")
+        
+        // Assert
+        Truth.assertThat(result.isError()).isTrue()
+        Truth.assertThat(result.getErrorOrNull()).isInstanceOf(ApiException.NetworkException::class.java)
+    }
+    
+    @Test
+    fun `fetchWordDefinition returns ServerException when word not found`() = runTest {
+        // Arrange - both APIs return 404
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\": \"Word not found\"}")
+        )
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(404)
+                .setBody("{\"error\": \"Word not found\"}")
+        )
+        
+        // Act
+        val result = apiRepository.fetchWordDefinition("invalidword")
+        
+        // Assert
+        Truth.assertThat(result.isError()).isTrue()
+        Truth.assertThat(result.getErrorOrNull()).isInstanceOf(ApiException.ServerException::class.java)
+    }
+}
+```
+
+#### 4.3 RevisionViewModel Tests
 
 ```kotlin
 class RevisionViewModelTest {
@@ -404,7 +494,7 @@ class RevisionViewModelTest {
 }
 ```
 
-#### 4.3 MainActivity Tests
+#### 4.4 MainActivity Tests
 
 ```kotlin
 class MainActivityTest {
@@ -442,7 +532,7 @@ class MainActivityTest {
 }
 ```
 
-#### 4.4 Repository Tests
+#### 4.5 Repository Tests
 
 ```kotlin
 class WordRepositoryTest {
@@ -507,7 +597,7 @@ class WordRepositoryTest {
 }
 ```
 
-#### 4.4 Utility Class Tests
+#### 4.6 Utility Class Tests
 
 ```kotlin
 class ValidationUtilsTest {

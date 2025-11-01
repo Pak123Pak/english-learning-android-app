@@ -239,8 +239,9 @@ R.java
 *.md
 !README.md
 
-# Ignore architecture documentation folder (internal documentation)
+# Ignore architecture and testing documentation folder (internal documentation)
 architecture/
+testing/
 
 # Allow testing documentation
 !testing/
