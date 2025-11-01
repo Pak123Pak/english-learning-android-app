@@ -90,48 +90,22 @@ class ApiRepository(
                 debugLog("Free Dictionary API FAILED for word: '$word'")
             }
             
-            // Both APIs failed - check if it's a network issue
+            // Both APIs failed
             debugLog("BOTH APIs failed for word: '$word'")
-            
-            // Check if both failures are due to network issues (no internet)
-            val cambridgeException = cambridgeResult.getErrorOrNull()
-            val fallbackException = fallbackResult.getErrorOrNull()
-            
-            val isNetworkError = (cambridgeException is ApiException.NetworkException || 
-                                  cambridgeException is ApiException.TimeoutException) &&
-                                 (fallbackException is ApiException.NetworkException || 
-                                  fallbackException is ApiException.TimeoutException)
-            
-            if (isNetworkError) {
-                debugLog("Network error detected - No Internet connection")
-                debugLog("=== API REPOSITORY FETCH COMPLETED (NO INTERNET) ===")
-                NetworkResult.Error(
-                    ApiException.NetworkException("No internet connection"),
-                    "No Internet"
-                )
-            } else {
-                debugLog("Word not found in any dictionary service")
-                debugLog("=== API REPOSITORY FETCH COMPLETED (FAILED) ===")
-                NetworkResult.Error(
-                    ApiException.ServerException(404, "Word not found in any dictionary service"),
-                    "Word '$word' not found"
-                )
-            }
+            debugLog("=== API REPOSITORY FETCH COMPLETED (FAILED) ===")
+            NetworkResult.Error(
+                ApiException.ServerException(404, "Word not found in any dictionary service"),
+                "Word '$word' not found"
+            )
             
         } catch (e: Exception) {
             debugLog("Exception during API fetch: ${e.message}")
             debugLog("Exception stack trace: ${e.stackTraceToString()}")
             debugLog("=== API REPOSITORY FETCH COMPLETED (EXCEPTION) ===")
-            
-            val networkException = NetworkUtils.createNetworkException(e)
-            val errorMessage = if (networkException is ApiException.NetworkException || 
-                                   networkException is ApiException.TimeoutException) {
-                "No Internet"
-            } else {
+            NetworkResult.Error(
+                NetworkUtils.createNetworkException(e),
                 "Failed to fetch word definition: ${e.message}"
-            }
-            
-            NetworkResult.Error(networkException, errorMessage)
+            )
         }
     }
     
