@@ -278,6 +278,9 @@ class RevisionActivity : AppCompatActivity() {
     
     private fun disableSubmit() {
         binding.submitButton.isEnabled = false
+        // Hide submit and hint buttons after answer submission
+        binding.submitButton.visibility = View.GONE
+        binding.hintButton.visibility = View.GONE
     }
     
     override fun onResume() {
