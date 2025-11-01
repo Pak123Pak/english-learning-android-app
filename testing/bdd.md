@@ -242,6 +242,15 @@ Feature: Navigation and User Experience
     When the user taps the system back button
     Then the user should return to the main menu
 
+  Scenario: Navigation from Revision to Dictionary and back
+    Given the user is on the Revision screen
+    And there are no words in the current stage
+    When the user taps the "Add New Words" button
+    Then the Dictionary Search screen should open
+    When the user taps the "Back to Main" button
+    Then the user should return to the main menu immediately
+    And the user should not be taken back to the Revision screen
+
   Scenario: App state persistence
     Given the user has searched for a word and selected a definition
     When the user navigates away from the app

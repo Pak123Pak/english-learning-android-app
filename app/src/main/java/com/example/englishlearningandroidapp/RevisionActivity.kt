@@ -90,6 +90,7 @@ class RevisionActivity : AppCompatActivity() {
         // Add new words button (navigate back to dictionary)
         binding.addWordsButton.setOnClickListener {
             val intent = Intent(this, DictionaryActivity::class.java)
+            intent.putExtra("SOURCE_ACTIVITY", "RevisionActivity")
             startActivity(intent)
         }
         

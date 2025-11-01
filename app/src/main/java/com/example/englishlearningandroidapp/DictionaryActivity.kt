@@ -1,5 +1,6 @@
 package com.example.englishlearningandroidapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -93,7 +94,7 @@ class DictionaryActivity : AppCompatActivity() {
         
         // Back button click
         binding.backButton.setOnClickListener {
-            finish()
+            handleBackNavigation()
         }
     }
     
@@ -207,7 +208,21 @@ class DictionaryActivity : AppCompatActivity() {
     }
     
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
+        handleBackNavigation()
         return true
+    }
+    
+    private fun handleBackNavigation() {
+        val sourceActivity = intent.getStringExtra("SOURCE_ACTIVITY")
+        if (sourceActivity == "RevisionActivity") {
+            // If came from RevisionActivity, go back to MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        } else {
+            // Otherwise, use normal back navigation
+            finish()
+        }
     }
 }

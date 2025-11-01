@@ -248,6 +248,17 @@ Then I should return to the main menu
 And any unsaved data should be preserved
 ```
 
+**AC4c: Back Navigation from Dictionary when accessed via Revision**
+```
+Given I am on the Revision screen
+And I tap the "Add New Words" button
+And I navigate to the Dictionary Search screen
+When I tap the "Back to Main" button
+Then I should return to the main menu directly
+And I should not be taken back to the Revision screen
+And the back stack should be properly managed
+```
+
 **AC5: Progress Indicators**
 ```
 Given I am on the revision screen with multiple words in a stage
