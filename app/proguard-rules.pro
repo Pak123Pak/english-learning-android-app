@@ -109,6 +109,16 @@
 -keep class com.google.gson.stream.** { *; }
 -keep class com.google.gson.examples.android.model.** { *; }
 
+# Keep all fields with @SerializedName annotation for Gson
+-keepclassmembers,allowobfuscation class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Keep all model classes that use @SerializedName - this is critical for API deserialization
+-keep class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
+
 # OkHttp
 -dontwarn okhttp3.**
 -dontwarn okio.**
