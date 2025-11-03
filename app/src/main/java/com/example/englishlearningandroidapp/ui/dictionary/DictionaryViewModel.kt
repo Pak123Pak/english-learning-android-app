@@ -46,6 +46,13 @@ class DictionaryViewModel(
     private val _actualWord = MutableLiveData<String?>()
     val actualWord: LiveData<String?> = _actualWord
     
+    // Store the full API response for pronunciation data
+    private var currentApiResponse: WordDefinitionResponse? = null
+    
+    // Pronunciation data for current search
+    private val _pronunciationData = MutableLiveData<Map<String, List<com.example.englishlearningandroidapp.data.api.Pronunciation>>>()
+    val pronunciationData: LiveData<Map<String, List<com.example.englishlearningandroidapp.data.api.Pronunciation>>> = _pronunciationData
+    
     // Loading state
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -105,9 +112,17 @@ class DictionaryViewModel(
                         debugLog("API Call Success!")
                         logApiResponse(result.data)
                         
+                        // Store the full API response for pronunciation data
+                        currentApiResponse = result.data
+                        
                         // Store the actual word from API response (e.g., "apple" instead of "apples")
                         _actualWord.value = result.data.word
                         debugLog("Actual word from API: '${result.data.word}' (searched: '$trimmedQuery')")
+                        
+                        // Extract pronunciation data grouped by part of speech
+                        val pronunciations = result.data.getAllPronunciationsGrouped()
+                        _pronunciationData.value = pronunciations
+                        debugLog("Found pronunciations for ${pronunciations.keys.size} parts of speech: ${pronunciations.keys}")
                         
                         val definitions = result.data.getMainDefinitions()
                         if (definitions.isNotEmpty()) {
@@ -203,13 +218,18 @@ class DictionaryViewModel(
                 val exampleSentence = currentDefinition.example ?: "Example with ${wordToSave}."
                 val blankExample = StringUtils.createBlankSentence(exampleSentence, wordToSave)
                 
+                // Get pronunciations for the selected part of speech
+                val pronunciationsForPos = currentApiResponse?.getPronunciationsForPartOfSpeech(currentDefinition.partOfSpeech) ?: emptyList()
+                val pronunciationJson = convertPronunciationsToJson(pronunciationsForPos)
+                
                 val word = Word(
                     englishWord = wordToSave, // Save the actual word from API (e.g., "apple" not "apples")
                     chineseTranslation = currentDefinition.translation,
                     partOfSpeech = currentDefinition.partOfSpeech,
                     exampleSentence = exampleSentence,
                     blankExampleSentence = blankExample,
-                    revisionStage = 0 // Start in "Not revised" stage
+                    revisionStage = 0, // Start in "Not revised" stage
+                    pronunciationData = pronunciationJson
                 )
                 
                 logWordSaveOperation(word)
@@ -254,6 +274,33 @@ class DictionaryViewModel(
         _errorMessage.value = null
         _searchValidationError.value = null
         _saveWordState.value = SaveWordState.Idle
+        _pronunciationData.value = emptyMap()
+        currentApiResponse = null
+    }
+    
+    /**
+     * Convert pronunciation list to JSON string for database storage
+     */
+    private fun convertPronunciationsToJson(pronunciations: List<com.example.englishlearningandroidapp.data.api.Pronunciation>): String? {
+        if (pronunciations.isEmpty()) {
+            debugLog("No pronunciations to convert to JSON")
+            return null
+        }
+        
+        return try {
+            // Create simple JSON format: [{"lang":"uk","url":"...","pron":"..."},...]
+            val jsonItems = pronunciations.map { p ->
+                val url = p.getAudioUrl() ?: p.url
+                debugLog("Converting pronunciation: lang=${p.lang}, url=$url, pron=${p.pron}")
+                """{"lang":"${p.lang}","url":"${url}","pron":"${p.pron}"}"""
+            }
+            val jsonString = "[${jsonItems.joinToString(",")}]"
+            debugLog("Generated pronunciation JSON: $jsonString")
+            jsonString
+        } catch (e: Exception) {
+            debugLog("Error converting pronunciations to JSON: ${e.message}")
+            null
+        }
     }
     
     /**
@@ -393,6 +440,15 @@ class DictionaryViewModel(
         debugLog("Example Sentence: ${word.exampleSentence}")
         debugLog("Blank Example: ${word.blankExampleSentence}")
         debugLog("Revision Stage: ${word.revisionStage} (${word.getStageDisplayName()})")
+        debugLog("Pronunciation Data: ${word.pronunciationData ?: "null"}")
+        debugLog("Has Pronunciation: ${word.hasPronunciation()}")
+        if (word.hasPronunciation()) {
+            val pronunciations = word.getPronunciations()
+            debugLog("Parsed Pronunciations Count: ${pronunciations.size}")
+            pronunciations.forEach { p ->
+                debugLog("  - ${p.lang.uppercase()}: ${p.pron} (${p.url})")
+            }
+        }
         debugLog("Created At: ${word.createdAt}")
         debugLog("Last Revised At: ${word.lastRevisedAt}")
         debugLog("=== END WORD SAVE ===")

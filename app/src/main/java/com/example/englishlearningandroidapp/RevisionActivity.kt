@@ -6,6 +6,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -13,11 +15,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import com.example.englishlearningandroidapp.data.database.Word
 import com.example.englishlearningandroidapp.databinding.ActivityRevisionBinding
 import com.example.englishlearningandroidapp.ui.revision.AnswerResult
 import com.example.englishlearningandroidapp.ui.revision.RevisionViewModel
 import com.example.englishlearningandroidapp.ui.getViewModelFactory
 import com.example.englishlearningandroidapp.utils.hideKeyboard
+import com.example.englishlearningandroidapp.utils.PronunciationPlayer
 
 class RevisionActivity : AppCompatActivity() {
     
@@ -212,7 +216,7 @@ class RevisionActivity : AppCompatActivity() {
         }
     }
     
-    private fun showWord(word: com.example.englishlearningandroidapp.data.database.Word) {
+    private fun showWord(word: Word) {
         binding.wordCard.visibility = View.VISIBLE
         binding.answerInputLayout.visibility = View.VISIBLE
         binding.hintButton.visibility = View.VISIBLE
@@ -223,6 +227,9 @@ class RevisionActivity : AppCompatActivity() {
         binding.chineseTranslationTextView.text = word.chineseTranslation
         binding.partOfSpeechTextView.text = word.partOfSpeech
         // Note: exampleSentenceTextView will be updated by the displayedExampleSentence observer
+        
+        // Display pronunciation buttons
+        displayPronunciationButtons(word)
         
         // Clear previous answer and feedback
         binding.answerEditText.text?.clear()
@@ -303,5 +310,96 @@ class RevisionActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressedDispatcher.onBackPressed()
         return true
+    }
+    
+    /**
+     * Display pronunciation buttons for the current word
+     */
+    private fun displayPronunciationButtons(word: Word) {
+        // Clear existing buttons
+        binding.pronunciationButtonsContainer.removeAllViews()
+        
+        // Debug logging
+        android.util.Log.d("RevisionActivity", "=== DISPLAYING PRONUNCIATIONS ===")
+        android.util.Log.d("RevisionActivity", "Word: ${word.englishWord}")
+        android.util.Log.d("RevisionActivity", "Part of Speech: ${word.partOfSpeech}")
+        android.util.Log.d("RevisionActivity", "Pronunciation Data: ${word.pronunciationData ?: "null"}")
+        android.util.Log.d("RevisionActivity", "Has Pronunciation: ${word.hasPronunciation()}")
+        
+        // Get pronunciations from word
+        val pronunciations = word.getPronunciations()
+        android.util.Log.d("RevisionActivity", "Parsed Pronunciations Count: ${pronunciations.size}")
+        
+        if (pronunciations.isEmpty()) {
+            android.util.Log.d("RevisionActivity", "No pronunciations found, hiding container")
+            binding.pronunciationButtonsContainer.visibility = View.GONE
+            return
+        }
+        
+        // Group by language
+        val groupedByLang = pronunciations.groupBy { it.lang.lowercase() }
+        android.util.Log.d("RevisionActivity", "Languages: ${groupedByLang.keys}")
+        
+        // Create button for each language
+        groupedByLang.forEach { (lang, pronList) ->
+            val pron = pronList.firstOrNull() ?: return@forEach
+            
+            android.util.Log.d("RevisionActivity", "Creating button for $lang: ${pron.pron} (${pron.url})")
+            
+            val button = Button(this).apply {
+                text = "${lang.uppercase()} ${pron.pron}"
+                textSize = 11f
+                setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, dpToPx(6), 0)
+                }
+                setOnClickListener {
+                    playPronunciation(pron.url)
+                }
+            }
+            
+            binding.pronunciationButtonsContainer.addView(button)
+        }
+        
+        binding.pronunciationButtonsContainer.visibility = View.VISIBLE
+        android.util.Log.d("RevisionActivity", "Pronunciation buttons displayed: ${binding.pronunciationButtonsContainer.childCount}")
+        android.util.Log.d("RevisionActivity", "=== END DISPLAYING PRONUNCIATIONS ===")
+    }
+    
+    /**
+     * Play pronunciation audio from URL
+     */
+    private fun playPronunciation(url: String) {
+        if (url.isBlank()) {
+            Toast.makeText(this, "No audio available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        PronunciationPlayer.playPronunciation(
+            context = this,
+            url = url,
+            onComplete = {
+                // Audio playback completed
+            },
+            onError = { errorMessage ->
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+    
+    /**
+     * Convert dp to pixels
+     */
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Release media player when activity is destroyed
+        PronunciationPlayer.release()
     }
 }

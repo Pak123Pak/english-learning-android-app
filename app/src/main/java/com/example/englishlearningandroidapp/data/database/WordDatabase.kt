@@ -2,6 +2,7 @@ package com.example.englishlearningandroidapp.data.database
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +10,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [Word::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(DatabaseTypeConverters::class)
@@ -20,6 +21,18 @@ abstract class WordDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: WordDatabase? = null
+        
+        /**
+         * Migration from version 1 to 2 - adds pronunciationData column
+         */
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add the new pronunciationData column with default null value
+                database.execSQL(
+                    "ALTER TABLE words ADD COLUMN pronunciationData TEXT DEFAULT NULL"
+                )
+            }
+        }
         
         /**
          * Get database instance (singleton pattern)
@@ -33,7 +46,9 @@ abstract class WordDatabase : RoomDatabase() {
                     WordDatabase::class.java,
                     "word_database"
                 )
+                .addMigrations(MIGRATION_1_2)
                 .addCallback(WordDatabaseCallback())
+                .fallbackToDestructiveMigration() // Fallback if migration fails (for development)
                 .build()
                 
                 INSTANCE = instance

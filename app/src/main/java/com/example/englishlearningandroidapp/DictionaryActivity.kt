@@ -2,8 +2,12 @@ package com.example.englishlearningandroidapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.englishlearningandroidapp.data.api.Pronunciation
 import com.example.englishlearningandroidapp.databinding.ActivityDictionaryBinding
 import com.example.englishlearningandroidapp.ui.ViewModelFactory
 import com.example.englishlearningandroidapp.ui.dictionary.DefinitionsAdapter
@@ -18,6 +23,7 @@ import com.example.englishlearningandroidapp.ui.dictionary.DictionaryViewModel
 import com.example.englishlearningandroidapp.ui.dictionary.SaveWordState
 import com.example.englishlearningandroidapp.ui.getViewModelFactory
 import com.example.englishlearningandroidapp.utils.hideKeyboard
+import com.example.englishlearningandroidapp.utils.PronunciationPlayer
 
 class DictionaryActivity : AppCompatActivity() {
     
@@ -107,6 +113,15 @@ class DictionaryActivity : AppCompatActivity() {
     }
     
     private fun observeViewModel() {
+        // Observe pronunciation data
+        viewModel.pronunciationData.observe(this) { pronunciationMap ->
+            if (pronunciationMap.isNotEmpty()) {
+                displayPronunciations(pronunciationMap)
+            } else {
+                hidePronunciations()
+            }
+        }
+        
         // Observe search results
         viewModel.searchResults.observe(this) { definitions ->
             if (definitions.isNotEmpty()) {
@@ -204,7 +219,132 @@ class DictionaryActivity : AppCompatActivity() {
         definitionsAdapter.clearSelection()
         hideDefinitions()
         hideError()
+        hidePronunciations()
         binding.saveButton.isEnabled = false
+    }
+    
+    /**
+     * Display pronunciations grouped by part of speech
+     */
+    private fun displayPronunciations(pronunciationMap: Map<String, List<Pronunciation>>) {
+        // Clear existing pronunciation views
+        binding.pronunciationContainer.removeAllViews()
+        
+        // Re-add title
+        val titleTextView = TextView(this).apply {
+            text = "Pronunciation"
+            textSize = 14f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setTextColor(getColor(com.google.android.material.R.color.design_default_color_primary))
+            setPadding(0, 0, 0, dpToPx(8))
+        }
+        binding.pronunciationContainer.addView(titleTextView)
+        
+        // Group pronunciations by part of speech
+        pronunciationMap.forEach { (pos, pronunciations) ->
+            // Create a row for this part of speech
+            val posRow = createPronunciationRow(pos, pronunciations)
+            binding.pronunciationContainer.addView(posRow)
+        }
+        
+        // Show the pronunciation card
+        binding.pronunciationCard.visibility = View.VISIBLE
+    }
+    
+    /**
+     * Create a pronunciation row for a specific part of speech
+     */
+    private fun createPronunciationRow(partOfSpeech: String, pronunciations: List<Pronunciation>): LinearLayout {
+        val rowLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, 0, dpToPx(8))
+            }
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        
+        // Part of speech label
+        val posLabel = TextView(this).apply {
+            text = partOfSpeech
+            textSize = 13f
+            setTypeface(null, android.graphics.Typeface.ITALIC)
+            setTextColor(getColor(com.google.android.material.R.color.design_default_color_secondary))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 0, dpToPx(12), 0)
+            }
+            minWidth = dpToPx(60)
+        }
+        rowLayout.addView(posLabel)
+        
+        // Group pronunciations by language (uk, us, etc.)
+        val groupedByLang = pronunciations.groupBy { it.lang.lowercase() }
+        
+        // Create buttons for each language
+        groupedByLang.forEach { (lang, pronList) ->
+            val pron = pronList.firstOrNull() ?: return@forEach
+            
+            // Language button
+            val langButton = Button(this).apply {
+                text = "${lang.uppercase()} ${pron.pron}"
+                textSize = 12f
+                setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, dpToPx(8), 0)
+                }
+                setOnClickListener {
+                    playPronunciation(pron)
+                }
+            }
+            rowLayout.addView(langButton)
+        }
+        
+        return rowLayout
+    }
+    
+    /**
+     * Play pronunciation audio
+     */
+    private fun playPronunciation(pronunciation: Pronunciation) {
+        val url = pronunciation.getAudioUrl()
+        if (url.isNullOrBlank()) {
+            Toast.makeText(this, "No audio available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        PronunciationPlayer.playPronunciation(
+            context = this,
+            url = url,
+            onComplete = {
+                // Audio playback completed
+            },
+            onError = { errorMessage ->
+                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+    
+    /**
+     * Hide pronunciation section
+     */
+    private fun hidePronunciations() {
+        binding.pronunciationCard.visibility = View.GONE
+        binding.pronunciationContainer.removeAllViews()
+    }
+    
+    /**
+     * Convert dp to pixels
+     */
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
     }
     
     override fun onSupportNavigateUp(): Boolean {
@@ -224,5 +364,11 @@ class DictionaryActivity : AppCompatActivity() {
             // Otherwise, use normal back navigation
             finish()
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Release media player when activity is destroyed
+        PronunciationPlayer.release()
     }
 }

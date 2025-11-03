@@ -52,6 +52,42 @@
         app:layout_constraintTop_toTopOf="@+id/searchInputLayout"
         app:layout_constraintBottom_toBottomOf="@+id/searchInputLayout" />
 
+    <!-- Pronunciation Section -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/pronunciationCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:cardElevation="2dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchInputLayout">
+
+        <LinearLayout
+            android:id="@+id/pronunciationContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/pronunciationTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pronunciation"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Dynamic pronunciation items will be added here programmatically -->
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Loading Indicator -->
     <ProgressBar
         android:id="@+id/loadingProgressBar"
@@ -60,7 +96,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationCard"
         app:layout_constraintBottom_toTopOf="@+id/definitionsRecyclerView" />
 
     <!-- Error Message -->
@@ -75,7 +111,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchInputLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationCard" />
 
     <!-- Retry Button -->
     <Button
@@ -101,7 +137,7 @@
         app:layout_constraintBottom_toTopOf="@+id/saveButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchInputLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationCard" />
 
     <!-- Instructions Text -->
     <TextView
@@ -114,7 +150,7 @@
         android:padding="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchInputLayout"
+        app:layout_constraintTop_toBottomOf="@+id/pronunciationCard"
         app:layout_constraintBottom_toTopOf="@+id/saveButton" />
 
     <!-- Save Button -->

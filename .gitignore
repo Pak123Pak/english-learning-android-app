@@ -239,13 +239,10 @@ R.java
 *.md
 !README.md
 
-# Ignore architecture and testing documentation folder (internal documentation)
+# Ignore architecture and testing documentation folders (internal documentation)
+# These folders contain planning and design documents not needed in the public repo
 architecture/
 testing/
-
-# Allow testing documentation
-!testing/
-!testing/*.md
 
 # If you add actual API keys in the future, make sure to exclude them:
 # app/src/main/res/values/api_keys.xml

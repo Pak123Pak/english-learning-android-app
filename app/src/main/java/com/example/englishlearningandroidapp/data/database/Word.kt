@@ -15,7 +15,9 @@ data class Word(
     val blankExampleSentence: String,
     val revisionStage: Int = 0, // 0: Not revised, 1: 1st, ..., 5: 5th or above
     val createdAt: Long = System.currentTimeMillis(),
-    val lastRevisedAt: Long = System.currentTimeMillis()
+    val lastRevisedAt: Long = System.currentTimeMillis(),
+    // Pronunciation URLs (stores JSON-encoded list of pronunciation objects for the selected part of speech)
+    val pronunciationData: String? = null // JSON format: [{"lang":"uk","url":"...","pron":"..."},{"lang":"us","url":"...","pron":"..."}]
 ) {
     /**
      * Get display name for the revision stage
@@ -63,6 +65,76 @@ data class Word(
         return copy(lastRevisedAt = System.currentTimeMillis())
     }
     
+    /**
+     * Get pronunciation URLs as a list of PronunciationInfo objects
+     */
+    fun getPronunciations(): List<PronunciationInfo> {
+        if (pronunciationData.isNullOrBlank()) return emptyList()
+        
+        return try {
+            // Parse JSON format: [{"lang":"uk","url":"...","pron":"..."},...]
+            val pronunciations = mutableListOf<PronunciationInfo>()
+            
+            // Remove outer brackets and split by objects
+            val trimmed = pronunciationData.trim()
+            if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+                return emptyList()
+            }
+            
+            val content = trimmed.substring(1, trimmed.length - 1)
+            if (content.isBlank()) return emptyList()
+            
+            // Split by "},{" to separate objects
+            val objects = content.split("},{")
+            
+            for (obj in objects) {
+                var objStr = obj.trim()
+                // Remove leading { and trailing }
+                if (objStr.startsWith("{")) objStr = objStr.substring(1)
+                if (objStr.endsWith("}")) objStr = objStr.substring(0, objStr.length - 1)
+                
+                if (objStr.isBlank()) continue
+                
+                var lang = ""
+                var url = ""
+                var pron = ""
+                
+                // Parse key-value pairs
+                // Handle URLs that contain commas or colons by using regex
+                val regex = """"(\w+)":"([^"]*)"""".toRegex()
+                val matches = regex.findAll(objStr)
+                
+                for (match in matches) {
+                    val key = match.groupValues[1]
+                    val value = match.groupValues[2]
+                    when (key) {
+                        "lang" -> lang = value
+                        "url" -> url = value
+                        "pron" -> pron = value
+                    }
+                }
+                
+                if (lang.isNotBlank() && url.isNotBlank()) {
+                    pronunciations.add(PronunciationInfo(lang, url, pron))
+                }
+            }
+            
+            pronunciations
+        } catch (e: Exception) {
+            // Log error for debugging
+            android.util.Log.e("Word", "Error parsing pronunciation data: ${e.message}", e)
+            android.util.Log.e("Word", "Pronunciation data was: $pronunciationData")
+            emptyList()
+        }
+    }
+    
+    /**
+     * Check if word has pronunciation data
+     */
+    fun hasPronunciation(): Boolean {
+        return !pronunciationData.isNullOrBlank()
+    }
+    
     companion object {
         const val STAGE_NOT_REVISED = 0
         const val STAGE_FIRST = 1
@@ -101,3 +173,12 @@ data class Word(
         }
     }
 }
+
+/**
+ * Simple data class for pronunciation information
+ */
+data class PronunciationInfo(
+    val lang: String,  // "uk" or "us" or other
+    val url: String,   // Audio URL
+    val pron: String   // Phonetic transcription
+)

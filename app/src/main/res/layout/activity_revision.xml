@@ -73,18 +73,37 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                android:id="@+id/partOfSpeechTextView"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="noun"
-                android:textSize="16sp"
-                android:textStyle="italic"
-                android:textColor="?attr/colorSecondary"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/part_of_speech_background"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/partOfSpeechTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="noun"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:textColor="?attr/colorSecondary"
+                    android:background="@drawable/part_of_speech_background"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp" />
+
+                <!-- Pronunciation buttons container -->
+                <LinearLayout
+                    android:id="@+id/pronunciationButtonsContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="12dp"
+                    android:visibility="gone">
+                    <!-- Pronunciation buttons will be added programmatically -->
+                </LinearLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/translationLabel"

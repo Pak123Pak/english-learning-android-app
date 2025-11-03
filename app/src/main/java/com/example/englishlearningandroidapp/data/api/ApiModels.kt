@@ -77,6 +77,25 @@ data class WordDefinitionResponse(
         return pronunciation?.firstOrNull()?.pron 
             ?: phonetic
     }
+    
+    /**
+     * Get pronunciations for a specific part of speech
+     * @param partOfSpeech The part of speech (e.g., "noun", "verb")
+     * @return List of pronunciations for that part of speech
+     */
+    fun getPronunciationsForPartOfSpeech(partOfSpeech: String): List<Pronunciation> {
+        return pronunciation?.filter { 
+            it.pos.equals(partOfSpeech, ignoreCase = true) 
+        } ?: emptyList()
+    }
+    
+    /**
+     * Get all unique pronunciations grouped by part of speech
+     * @return Map of part of speech to list of pronunciations
+     */
+    fun getAllPronunciationsGrouped(): Map<String, List<Pronunciation>> {
+        return pronunciation?.groupBy { it.pos } ?: emptyMap()
+    }
 }
 
 /**
