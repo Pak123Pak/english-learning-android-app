@@ -52,13 +52,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="noun"
-                    android:textSize="12sp"
-                    android:textColor="?attr/colorPrimary"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorSecondary"
                     android:textStyle="italic"
                     android:layout_marginTop="2dp"
                     android:background="@drawable/part_of_speech_background"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
                     tools:text="noun" />
 
             </LinearLayout>

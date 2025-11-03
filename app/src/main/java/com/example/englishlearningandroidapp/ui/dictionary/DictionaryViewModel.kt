@@ -218,14 +218,17 @@ class DictionaryViewModel(
                 val exampleSentence = currentDefinition.example ?: "Example with ${wordToSave}."
                 val blankExample = StringUtils.createBlankSentence(exampleSentence, wordToSave)
                 
-                // Get pronunciations for the selected part of speech
-                val pronunciationsForPos = currentApiResponse?.getPronunciationsForPartOfSpeech(currentDefinition.partOfSpeech) ?: emptyList()
+                // Normalize part of speech to base form (e.g., "noun" instead of "noun [ C usually plural ]")
+                val normalizedPartOfSpeech = StringUtils.normalizePartOfSpeech(currentDefinition.partOfSpeech)
+                
+                // Get pronunciations for the selected part of speech (normalization is handled in API model)
+                val pronunciationsForPos = currentApiResponse?.getPronunciationsForPartOfSpeech(normalizedPartOfSpeech) ?: emptyList()
                 val pronunciationJson = convertPronunciationsToJson(pronunciationsForPos)
                 
                 val word = Word(
                     englishWord = wordToSave, // Save the actual word from API (e.g., "apple" not "apples")
                     chineseTranslation = currentDefinition.translation,
-                    partOfSpeech = currentDefinition.partOfSpeech,
+                    partOfSpeech = normalizedPartOfSpeech, // Save normalized part of speech
                     exampleSentence = exampleSentence,
                     blankExampleSentence = blankExample,
                     revisionStage = 0, // Start in "Not revised" stage

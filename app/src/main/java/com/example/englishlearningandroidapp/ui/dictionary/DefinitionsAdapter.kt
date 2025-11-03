@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.englishlearningandroidapp.R
 import com.example.englishlearningandroidapp.data.api.Definition
+import com.example.englishlearningandroidapp.utils.StringUtils
 
 /**
  * Adapter for displaying word definitions in a RecyclerView with single selection
@@ -101,7 +102,8 @@ class DefinitionsAdapter(
             
             // Set definition content
             chineseTranslationTextView.text = definition.translation
-            partOfSpeechTextView.text = definition.partOfSpeech
+            // Normalize part of speech to show only base form (e.g., "noun" instead of "noun [ C usually plural ]")
+            partOfSpeechTextView.text = StringUtils.normalizePartOfSpeech(definition.partOfSpeech)
             
             // Set example sentence
             if (!definition.example.isNullOrBlank()) {

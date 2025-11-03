@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -24,6 +25,7 @@ import com.example.englishlearningandroidapp.ui.dictionary.SaveWordState
 import com.example.englishlearningandroidapp.ui.getViewModelFactory
 import com.example.englishlearningandroidapp.utils.hideKeyboard
 import com.example.englishlearningandroidapp.utils.PronunciationPlayer
+import com.example.englishlearningandroidapp.utils.StringUtils
 
 class DictionaryActivity : AppCompatActivity() {
     
@@ -266,45 +268,75 @@ class DictionaryActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         }
         
-        // Part of speech label
+        // Part of speech label with styled background
         val posLabel = TextView(this).apply {
-            text = partOfSpeech
-            textSize = 13f
+            text = StringUtils.normalizePartOfSpeech(partOfSpeech) // Normalize to base form
+            textSize = 14f
             setTypeface(null, android.graphics.Typeface.ITALIC)
             setTextColor(getColor(com.google.android.material.R.color.design_default_color_secondary))
+            setBackgroundResource(R.drawable.part_of_speech_background)
+            setPadding(dpToPx(12), dpToPx(4), dpToPx(12), dpToPx(4))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
                 setMargins(0, 0, dpToPx(12), 0)
             }
-            minWidth = dpToPx(60)
         }
         rowLayout.addView(posLabel)
         
         // Group pronunciations by language (uk, us, etc.)
         val groupedByLang = pronunciations.groupBy { it.lang.lowercase() }
         
-        // Create buttons for each language
+        // Create pronunciation items for each language (text + speaker icon)
         groupedByLang.forEach { (lang, pronList) ->
             val pron = pronList.firstOrNull() ?: return@forEach
             
-            // Language button
-            val langButton = Button(this).apply {
-                text = "${lang.uppercase()} ${pron.pron}"
-                textSize = 12f
-                setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6))
+            // Container for text + icon
+            val pronunciationContainer = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(0, 0, dpToPx(8), 0)
+                    setMargins(0, 0, dpToPx(12), 0)
                 }
+            }
+            
+            // Language text (without phonetic)
+            val langText = TextView(this).apply {
+                text = lang.uppercase()
+                textSize = 12f
+                setTextColor(getColor(com.google.android.material.R.color.design_default_color_on_surface))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, dpToPx(4), 0)
+                }
+            }
+            pronunciationContainer.addView(langText)
+            
+            // Speaker icon
+            val speakerIcon = ImageView(this).apply {
+                setImageResource(R.drawable.ic_speaker)
+                layoutParams = LinearLayout.LayoutParams(
+                    dpToPx(20),
+                    dpToPx(20)
+                )
+                setPadding(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2))
                 setOnClickListener {
                     playPronunciation(pron)
                 }
+                // Add ripple effect for better UX
+                isClickable = true
+                isFocusable = true
+                foreground = getDrawable(android.R.drawable.list_selector_background)
             }
-            rowLayout.addView(langButton)
+            pronunciationContainer.addView(speakerIcon)
+            
+            rowLayout.addView(pronunciationContainer)
         }
         
         return rowLayout

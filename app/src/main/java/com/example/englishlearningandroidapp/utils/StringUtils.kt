@@ -184,4 +184,24 @@ object StringUtils {
         val end = minOf(text.length, start + length)
         return if (start < text.length) text.substring(start, end) else ""
     }
+    
+    /**
+     * Normalize part of speech to base form only
+     * Extracts base word class from strings like "noun [ C usually plural ]" -> "noun"
+     * @param partOfSpeech The raw part of speech string from API
+     * @return Normalized part of speech (e.g., "noun", "verb", "adjective")
+     */
+    fun normalizePartOfSpeech(partOfSpeech: String): String {
+        if (partOfSpeech.isBlank()) return partOfSpeech
+        
+        // Remove everything after (and including) the first bracket or parenthesis
+        val normalized = partOfSpeech
+            .trim()
+            .split("[", "(", "/", "|")
+            .firstOrNull()
+            ?.trim()
+            ?: partOfSpeech.trim()
+        
+        return normalized.lowercase()
+    }
 }

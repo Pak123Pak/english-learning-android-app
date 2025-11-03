@@ -2,12 +2,15 @@ package com.example.englishlearningandroidapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -340,28 +343,57 @@ class RevisionActivity : AppCompatActivity() {
         val groupedByLang = pronunciations.groupBy { it.lang.lowercase() }
         android.util.Log.d("RevisionActivity", "Languages: ${groupedByLang.keys}")
         
-        // Create button for each language
+        // Create pronunciation items for each language (text + speaker icon)
         groupedByLang.forEach { (lang, pronList) ->
             val pron = pronList.firstOrNull() ?: return@forEach
             
-            android.util.Log.d("RevisionActivity", "Creating button for $lang: ${pron.pron} (${pron.url})")
+            android.util.Log.d("RevisionActivity", "Creating pronunciation item for $lang: ${pron.pron} (${pron.url})")
             
-            val button = Button(this).apply {
-                text = "${lang.uppercase()} ${pron.pron}"
-                textSize = 11f
-                setPadding(dpToPx(8), dpToPx(4), dpToPx(8), dpToPx(4))
+            // Container for text + icon
+            val pronunciationContainer = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(0, 0, dpToPx(6), 0)
-                }
-                setOnClickListener {
-                    playPronunciation(pron.url)
+                    setMargins(0, 0, dpToPx(12), 0)
                 }
             }
             
-            binding.pronunciationButtonsContainer.addView(button)
+            // Language text (without phonetic)
+            val langText = TextView(this).apply {
+                text = lang.uppercase()
+                textSize = 11f
+                setTextColor(getColor(com.google.android.material.R.color.design_default_color_on_surface))
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, dpToPx(4), 0)
+                }
+            }
+            pronunciationContainer.addView(langText)
+            
+            // Speaker icon
+            val speakerIcon = ImageView(this).apply {
+                setImageResource(R.drawable.ic_speaker)
+                layoutParams = LinearLayout.LayoutParams(
+                    dpToPx(18),
+                    dpToPx(18)
+                )
+                setPadding(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2))
+                setOnClickListener {
+                    playPronunciation(pron.url)
+                }
+                // Add ripple effect for better UX
+                isClickable = true
+                isFocusable = true
+                foreground = getDrawable(android.R.drawable.list_selector_background)
+            }
+            pronunciationContainer.addView(speakerIcon)
+            
+            binding.pronunciationButtonsContainer.addView(pronunciationContainer)
         }
         
         binding.pronunciationButtonsContainer.visibility = View.VISIBLE

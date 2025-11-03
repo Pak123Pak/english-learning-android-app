@@ -1,5 +1,6 @@
 package com.example.englishlearningandroidapp.data.api
 
+import com.example.englishlearningandroidapp.utils.StringUtils
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -84,17 +85,21 @@ data class WordDefinitionResponse(
      * @return List of pronunciations for that part of speech
      */
     fun getPronunciationsForPartOfSpeech(partOfSpeech: String): List<Pronunciation> {
+        val normalizedSearchPos = StringUtils.normalizePartOfSpeech(partOfSpeech)
         return pronunciation?.filter { 
-            it.pos.equals(partOfSpeech, ignoreCase = true) 
+            val normalizedApiPos = StringUtils.normalizePartOfSpeech(it.pos)
+            normalizedApiPos.equals(normalizedSearchPos, ignoreCase = true) 
         } ?: emptyList()
     }
     
     /**
      * Get all unique pronunciations grouped by part of speech
-     * @return Map of part of speech to list of pronunciations
+     * @return Map of part of speech to list of pronunciations (keys are normalized)
      */
     fun getAllPronunciationsGrouped(): Map<String, List<Pronunciation>> {
-        return pronunciation?.groupBy { it.pos } ?: emptyMap()
+        return pronunciation?.groupBy { 
+            StringUtils.normalizePartOfSpeech(it.pos)
+        } ?: emptyMap()
     }
 }
 
