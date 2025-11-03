@@ -365,7 +365,12 @@ class RevisionActivity : AppCompatActivity() {
             val langText = TextView(this).apply {
                 text = lang.uppercase()
                 textSize = 11f
-                setTextColor(getColor(com.google.android.material.R.color.design_default_color_on_surface))
+                // Use colorOnSurface for better contrast with card background
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this,
+                    com.google.android.material.R.attr.colorOnSurface,
+                    android.graphics.Color.BLACK
+                ))
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT

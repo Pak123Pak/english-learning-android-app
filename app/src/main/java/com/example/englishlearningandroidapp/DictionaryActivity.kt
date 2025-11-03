@@ -237,7 +237,12 @@ class DictionaryActivity : AppCompatActivity() {
             text = "Pronunciation"
             textSize = 14f
             setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(getColor(com.google.android.material.R.color.design_default_color_primary))
+            // Use colorOnSurface for better contrast with card background
+            setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOnSurface,
+                android.graphics.Color.BLACK
+            ))
             setPadding(0, 0, 0, dpToPx(8))
         }
         binding.pronunciationContainer.addView(titleTextView)
@@ -273,7 +278,12 @@ class DictionaryActivity : AppCompatActivity() {
             text = StringUtils.normalizePartOfSpeech(partOfSpeech) // Normalize to base form
             textSize = 14f
             setTypeface(null, android.graphics.Typeface.ITALIC)
-            setTextColor(getColor(com.google.android.material.R.color.design_default_color_secondary))
+            // Use colorOnSurface for better contrast with card background
+            setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorOnSurface,
+                android.graphics.Color.BLACK
+            ))
             setBackgroundResource(R.drawable.part_of_speech_background)
             setPadding(dpToPx(12), dpToPx(4), dpToPx(12), dpToPx(4))
             layoutParams = LinearLayout.LayoutParams(
@@ -308,7 +318,12 @@ class DictionaryActivity : AppCompatActivity() {
             val langText = TextView(this).apply {
                 text = lang.uppercase()
                 textSize = 12f
-                setTextColor(getColor(com.google.android.material.R.color.design_default_color_on_surface))
+                // Use colorOnSurface for better contrast with card background
+                setTextColor(com.google.android.material.color.MaterialColors.getColor(
+                    this,
+                    com.google.android.material.R.attr.colorOnSurface,
+                    android.graphics.Color.BLACK
+                ))
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
