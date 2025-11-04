@@ -24,13 +24,13 @@ When a new version is available:
 2. Install directly over your existing app
 3. **Your data is safe**: All saved words and progress will be preserved
 
-**Note**: If you encounter "App not installed" errors, this app now uses consistent signing to prevent such issues. Simply install the latest version directly.
+**Note**: This app uses consistent signing until v1.3. Ppdating to replace version older than v 1.3 will encounter "App not installed" errors.
 
 ## How to Use
 
-1. **Main Menu**: Choose between "Dictionary Lookup" or "Revision"
+1. **Main Menu**: Choose between "English - Chinese" or "Revision"
 
-2. **Dictionary Lookup**:
+2. **English - Chinese**:
    - Search for any English word
    - Select the Chinese definition that matches your context
    - Save to start learning

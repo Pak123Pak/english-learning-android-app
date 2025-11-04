@@ -4,7 +4,7 @@
     <!-- Main Activity -->
     <string name="app_title">English Learning</string>
     <string name="app_subtitle">Learn English with Traditional Chinese</string>
-    <string name="dictionary_button">English-Chinese-Traditional</string>
+    <string name="dictionary_button">English – Chinese</string>
     <string name="revision_button">Revision</string>
     <string name="delete_all_button">Delete All Words</string>
     <string name="delete_word_button">Delete Word</string>
