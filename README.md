@@ -59,14 +59,6 @@ When a new version is available:
 - **Minimal Permissions**: Only internet access required
 - **Open Source**: Code is publicly available for security review
 
-## Development & Contributing
-
-For developers interested in building or contributing to this project:
-- **Build Guide**: See [SETUP_SUMMARY.md](./SETUP_SUMMARY.md) for development setup
-- **Deployment**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for release instructions
-- **Version Management**: See [VERSION_MANAGEMENT.md](./VERSION_MANAGEMENT.md) for versioning and update strategy
-- **Security**: See [SECURITY_RECOMMENDATIONS.md](./SECURITY_RECOMMENDATIONS.md) for security guidelines
-
 ## Support
 
 If you encounter any issues:
