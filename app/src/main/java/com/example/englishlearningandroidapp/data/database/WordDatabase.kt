@@ -48,7 +48,10 @@ abstract class WordDatabase : RoomDatabase() {
                 )
                 .addMigrations(MIGRATION_1_2)
                 .addCallback(WordDatabaseCallback())
-                .fallbackToDestructiveMigration() // Fallback if migration fails (for development)
+                // NOTE: fallbackToDestructiveMigration() is disabled to protect user data
+                // All schema changes must have proper migrations defined
+                // Uncomment only during development if needed:
+                // .fallbackToDestructiveMigration()
                 .build()
                 
                 INSTANCE = instance

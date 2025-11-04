@@ -13,16 +13,24 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 2
-        versionName = "1.0.1"
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
-            // Using debug keystore for direct APK distribution
-            // This is safe for apps distributed outside Google Play Store
-            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+            // Using project-specific debug keystore for consistent signing
+            // This ensures app updates work correctly across all environments
+            // Safe for apps distributed outside Google Play Store
+            storeFile = file("${project.rootDir}/keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+        getByName("debug") {
+            // Use the same keystore for debug builds to ensure consistency
+            storeFile = file("${project.rootDir}/keystore/debug.keystore")
             storePassword = "android"
             keyAlias = "androiddebugkey"
             keyPassword = "android"

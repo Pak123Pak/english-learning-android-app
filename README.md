@@ -17,6 +17,15 @@ An Android application for learning English vocabulary with Traditional Chinese 
 - Internet connection for dictionary lookups
 - Approximately 5-10MB storage space
 
+### Updating the App
+
+When a new version is available:
+1. Download the latest APK from [Releases](../../releases)
+2. Install directly over your existing app
+3. **Your data is safe**: All saved words and progress will be preserved
+
+**Note**: If you encounter "App not installed" errors, this app now uses consistent signing to prevent such issues. Simply install the latest version directly.
+
 ## How to Use
 
 1. **Main Menu**: Choose between "Dictionary Lookup" or "Revision"
@@ -49,6 +58,14 @@ An Android application for learning English vocabulary with Traditional Chinese 
 - **No Backups**: Backup disabled to prevent data extraction
 - **Minimal Permissions**: Only internet access required
 - **Open Source**: Code is publicly available for security review
+
+## Development & Contributing
+
+For developers interested in building or contributing to this project:
+- **Build Guide**: See [SETUP_SUMMARY.md](./SETUP_SUMMARY.md) for development setup
+- **Deployment**: See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for release instructions
+- **Version Management**: See [VERSION_MANAGEMENT.md](./VERSION_MANAGEMENT.md) for versioning and update strategy
+- **Security**: See [SECURITY_RECOMMENDATIONS.md](./SECURITY_RECOMMENDATIONS.md) for security guidelines
 
 ## Support
 
