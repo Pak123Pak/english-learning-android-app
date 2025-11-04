@@ -73,6 +73,9 @@ class RevisionViewModel(
     private val _isHintButtonEnabled = MutableLiveData<Boolean>()
     val isHintButtonEnabled: LiveData<Boolean> = _isHintButtonEnabled
     
+    // Track if the last answer moved the word out of current stage
+    private var lastAnswerMovedWord = false
+    
     init {
         _currentStage.value = 0 // Start with "Not revised"
         _currentPosition.value = 0
@@ -94,6 +97,7 @@ class RevisionViewModel(
             _currentPosition.value = 0
             _answerResult.value = AnswerResult.Idle
             _showFeedback.value = false
+            lastAnswerMovedWord = false
             loadWordsForCurrentStage()
         }
     }
@@ -169,8 +173,12 @@ class RevisionViewModel(
             try {
                 // Advance word to next stage or keep in "5th or above"
                 val result = if (word.revisionStage < 5) {
+                    // Word will move to next stage
+                    lastAnswerMovedWord = true
                     wordRepository.advanceWordStage(word)
                 } else {
+                    // Word stays in "5th or above" stage
+                    lastAnswerMovedWord = false
                     wordRepository.keepWordInStage(word)
                 }
                 
@@ -193,6 +201,8 @@ class RevisionViewModel(
         viewModelScope.launch {
             try {
                 // Keep word in current stage but update last revised time
+                // Word stays in same stage, just moves to end
+                lastAnswerMovedWord = false
                 val result = wordRepository.keepWordInStage(word)
                 
                 if (result.isFailure) {
@@ -209,26 +219,61 @@ class RevisionViewModel(
     
     /**
      * Move to the next word in the current stage
+     * 
+     * Logic:
+     * - If last answer moved word out of stage (correct answer in stages 0-4):
+     *   Stay at same position, but total decreases (e.g., "Word 1 of 4" → "Word 1 of 3")
+     * - If last answer kept word in stage (incorrect or stage 5):
+     *   Move to next position with same total (e.g., "Word 2 of 10" → "Word 3 of 10")
      */
     private fun moveToNextWord() {
-        val words = _wordsInCurrentStage.value ?: return
         val currentPos = _currentPosition.value ?: 0
         
-        if (currentPos < words.size) {
-            // Move to next word in the list
-            val nextPosition = currentPos + 1
-            _currentWord.value = words[nextPosition - 1]
-            _currentPosition.value = nextPosition
-            updateProgressText(nextPosition, words.size)
-            resetHintState()
-        } else {
-            // Reload the stage (words may have moved)
-            loadWordsForCurrentStage()
+        // Reload words from database to get the updated list
+        viewModelScope.launch {
+            try {
+                val stage = _currentStage.value ?: 0
+                val updatedWords = wordRepository.getWordsByStageSync(stage)
+                _wordsInCurrentStage.value = updatedWords
+                
+                if (updatedWords.isEmpty()) {
+                    // No more words in this stage
+                    _currentWord.value = null
+                    _currentPosition.value = 0
+                    _progressText.value = ""
+                } else {
+                    // Determine next position based on whether word moved out of stage
+                    val nextPosition = if (lastAnswerMovedWord) {
+                        // Word moved to another stage, stay at same position
+                        currentPos
+                    } else {
+                        // Word stayed in stage (moved to end), advance position
+                        currentPos + 1
+                    }
+                    
+                    // Check if we have a word at this position
+                    if (nextPosition <= updatedWords.size) {
+                        _currentWord.value = updatedWords[nextPosition - 1]
+                        _currentPosition.value = nextPosition
+                        updateProgressText(nextPosition, updatedWords.size)
+                        resetHintState()
+                    } else {
+                        // We've gone through all words, reload from beginning
+                        loadWordsForCurrentStage()
+                    }
+                }
+                
+                // Reset the flag for next iteration
+                lastAnswerMovedWord = false
+                
+                // Clear feedback after moving to next word
+                _showFeedback.value = false
+                _answerResult.value = AnswerResult.Idle
+                
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to load next word: ${e.message}"
+            }
         }
-        
-        // Clear feedback after moving to next word
-        _showFeedback.value = false
-        _answerResult.value = AnswerResult.Idle
     }
     
     /**
