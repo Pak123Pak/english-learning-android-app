@@ -35,7 +35,7 @@ class WordRepository(
             val isDuplicate = wordDao.isDuplicateWord(word.englishWord, word.chineseTranslation)
             if (isDuplicate) {
                 return@withContext Result.failure(
-                    DuplicateWordException("Word '${word.englishWord}' with translation '${word.chineseTranslation}' already exists")
+                    DuplicateWordException("The word with this translation already exists")
                 )
             }
             

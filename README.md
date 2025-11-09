@@ -24,7 +24,7 @@ When a new version is available:
 2. Install directly over your existing app
 3. **Your data is safe**: All saved words and progress will be preserved
 
-**Note**: This app uses consistent signing until v1.3. Ppdating to replace version older than v 1.3 will encounter "App not installed" errors.
+**Note**: This app uses consistent signing until v1.3. Updating to replace version older than v1.3 will encounter "App not installed" errors.
 
 ## How to Use
 
