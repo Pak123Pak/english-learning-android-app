@@ -351,6 +351,30 @@ class RevisionViewModel(
     }
     
     /**
+     * Navigate to a specific word position in the current stage
+     * @param position The 1-based position to navigate to (e.g., 1 for first word)
+     */
+    fun navigateToWordAtPosition(position: Int) {
+        val words = _wordsInCurrentStage.value ?: return
+        
+        if (position < 1 || position > words.size) {
+            _errorMessage.value = "Invalid word position"
+            return
+        }
+        
+        // Update current position and word
+        _currentPosition.value = position
+        _currentWord.value = words[position - 1]
+        updateProgressText(position, words.size)
+        resetHintState()
+        
+        // Clear any previous answer state
+        _answerResult.value = AnswerResult.Idle
+        _showFeedback.value = false
+        lastAnswerMovedWord = false
+    }
+    
+    /**
      * Get all stage names for spinner
      */
     fun getStageNames(): List<String> {

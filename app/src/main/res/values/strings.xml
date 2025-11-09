@@ -35,6 +35,9 @@
     <string name="back_to_main">← Back to Main</string>
     <string name="add_words_button">Add New Words</string>
     <string name="empty_stage_message">No words in this stage yet</string>
+    <string name="word_list_button_desc">Show word list</string>
+    <string name="word_list_dialog_title">Words in this stage</string>
+    <string name="no_words_in_stage">No words in this stage</string>
     
     <!-- Feedback Messages -->
     <string name="correct_answer">Correct!</string>

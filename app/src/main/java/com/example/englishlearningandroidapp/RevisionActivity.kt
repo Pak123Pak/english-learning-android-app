@@ -120,6 +120,11 @@ class RevisionActivity : AppCompatActivity() {
         binding.hintButton.setOnClickListener {
             viewModel.revealNextLetter()
         }
+        
+        // Word list button click
+        binding.wordListButton.setOnClickListener {
+            showWordListDialog()
+        }
     }
     
     private fun submitAnswer() {
@@ -151,7 +156,7 @@ class RevisionActivity : AppCompatActivity() {
         // Observe progress text
         viewModel.progressText.observe(this) { progressText ->
             binding.progressTextView.text = progressText
-            binding.progressTextView.visibility = if (progressText.isNotEmpty()) View.VISIBLE else View.GONE
+            binding.progressContainer.visibility = if (progressText.isNotEmpty()) View.VISIBLE else View.GONE
         }
         
         // Observe answer result
@@ -247,7 +252,7 @@ class RevisionActivity : AppCompatActivity() {
         binding.hintButton.visibility = View.GONE
         binding.submitButton.visibility = View.GONE
         binding.deleteWordButton.visibility = View.GONE
-        binding.progressTextView.visibility = View.GONE
+        binding.progressContainer.visibility = View.GONE
         
         binding.emptyStateLayout.visibility = View.VISIBLE
         binding.emptyStateTextView.text = getString(R.string.empty_stage_message)
@@ -434,9 +439,58 @@ class RevisionActivity : AppCompatActivity() {
         return (dp * resources.displayMetrics.density).toInt()
     }
     
+    /**
+     * Show word list dialog for navigation
+     */
+    private fun showWordListDialog() {
+        val words = viewModel.wordsInCurrentStage.value
+        if (words.isNullOrEmpty()) {
+            Toast.makeText(this, getString(R.string.no_words_in_stage), Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        // Inflate dialog layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_word_list, null)
+        val recyclerView = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.wordListRecyclerView)
+        
+        // Setup RecyclerView
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        val adapter = com.example.englishlearningandroidapp.ui.revision.WordListAdapter(words) { position ->
+            // Navigate to selected word (position is 0-based, but navigateToWordAtPosition expects 1-based)
+            viewModel.navigateToWordAtPosition(position + 1)
+            // Dismiss dialog after selection
+            currentWordListDialog?.dismiss()
+        }
+        recyclerView.adapter = adapter
+        
+        // Create and show dialog
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+        
+        // Make dialog dismissible by clicking outside
+        dialog.setCanceledOnTouchOutside(true)
+        
+        currentWordListDialog = dialog
+        dialog.show()
+        
+        // Set dialog window size to ensure proper scrolling
+        // Calculate height: max 60% of screen height to ensure scrollability
+        val displayMetrics = resources.displayMetrics
+        val dialogHeight = (displayMetrics.heightPixels * 0.6).toInt()
+        val dialogWidth = (displayMetrics.widthPixels * 0.85).toInt()
+        
+        dialog.window?.setLayout(dialogWidth, dialogHeight)
+    }
+    
+    // Keep track of the current word list dialog
+    private var currentWordListDialog: AlertDialog? = null
+    
     override fun onDestroy() {
         super.onDestroy()
         // Release media player when activity is destroyed
         PronunciationPlayer.release()
+        // Dismiss dialog if showing
+        currentWordListDialog?.dismiss()
     }
 }
