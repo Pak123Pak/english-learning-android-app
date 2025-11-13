@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">English Learning</string>
+    <string name="app_name">EchoWords</string>
     
     <!-- Main Activity -->
     <string name="app_title">English Learning</string>
